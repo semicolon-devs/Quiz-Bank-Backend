@@ -1,6 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
+import { QuestionType } from 'src/enums/questionType.enum';
 import { Subject } from 'src/enums/subjects.enum';
+import { Answer } from './answer.schema';
 
 export type QuestionDocument = HydratedDocument<Question>;
 
@@ -12,17 +14,14 @@ export class Question {
   @Prop({ type: String, required: true })
   category: string;
 
-  @Prop({ type: String, required: true })
-  type: string;
+  @Prop({ type: String, enum: QuestionType, required: true })
+  type: QuestionType;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, maxlength: 20 * 1024 * 1024, required: true })
   question: string;
 
-  @Prop({type: Blob, required: false})
-  image: Blob
-
-  @Prop([{ type: mongoose.Schema.Types.ObjectId, required: true, ref: "Answer" }])
-  answers: String[];
+  @Prop([{ type: Answer, required: true }])
+  answers: Answer[];
 }
 
 export const QuestionSchema = SchemaFactory.createForClass(Question);

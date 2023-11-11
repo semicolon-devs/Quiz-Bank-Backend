@@ -51,14 +51,6 @@ export class SubjectsService {
   async update(id: number, updateSubjectDto: UpdateSubjectDto) {
     const subCategoryArray: SubCategory[] = [];
     
-    // updateSubjectDto.subCategories.forEach(async (item) => {
-    //   await this.subCategoryModel
-    //     .create({ name: item })
-    //     .then((result: SubCategory) => {
-    //       subCategoryArray.push(result.name);
-    //     });
-    // });
-
     const subject: Subject = {
       name: updateSubjectDto.name,
       subCategories: subCategoryArray,
@@ -68,6 +60,6 @@ export class SubjectsService {
   }
 
   remove(id: number) {
-    return this.subjectModel.findByIdAndRemove(id);
+    return this.subjectModel.findByIdAndUpdate(id);
   }
 }

@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import * as dotenv from 'dotenv';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { QuestionsModule } from './questions/questions.module';
+import { SubjectsModule } from './subjects/subjects.module';
 dotenv.config();
 
 @Module({
@@ -21,6 +22,7 @@ dotenv.config();
       },
     ]),
     QuestionsModule,
+    SubjectsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

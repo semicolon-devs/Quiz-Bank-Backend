@@ -9,7 +9,7 @@ export type QuestionDocument = HydratedDocument<Question>;
 export class Question {
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'subjects',
+    ref: 'subject',
     required: true,
   })
   subject: mongoose.Schema.Types.ObjectId;

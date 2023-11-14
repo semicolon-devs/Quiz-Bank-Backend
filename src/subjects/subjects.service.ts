@@ -6,6 +6,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { SubCategory } from './schemas/subCategory.schema';
 import { AddSubjectDto } from './dto/add-subject.dto';
+import { Question } from 'src/questions/schemas/question.schema';
 
 @Injectable()
 export class SubjectsService {
@@ -13,6 +14,7 @@ export class SubjectsService {
     @InjectModel(Subject.name) private readonly subjectModel: Model<Subject>,
     @InjectModel(SubCategory.name)
     private readonly subCategoryModel: Model<SubCategory>,
+    @InjectModel(Question.name) private readonly questionModel: Model<Question>,
   ) {}
 
   async create(createSubjectDto: CreateSubjectDto) {
@@ -42,6 +44,10 @@ export class SubjectsService {
       });
   }
 
+  findAllCources() {
+    return this.subCategoryModel.find();
+  }
+
   findAll() {
     return this.subjectModel.find();
   }
@@ -64,6 +70,26 @@ export class SubjectsService {
   }
 
   remove(id: number) {
+    this.questionModel.updateMany(
+      { subject: id },
+      { subject: 'Other subject id', subCategory: 'Other subject category id' }, // replace id with other object id
+      { new: true },
+    );
+
     return this.subjectModel.findByIdAndUpdate(id);
+  }
+
+  removeSubCategory(id: string, course_id: string) {
+    this.questionModel.updateMany(
+      { subCategory: course_id },
+      { subCategory: 'Other subject id' }, // replace id with other object id
+      { new: true },
+    );
+
+    return this.subjectModel.findByIdAndUpdate(
+      id,
+      { $pull: { subCategories: { _id: course_id } } },
+      { new: true },
+    );
   }
 }

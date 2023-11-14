@@ -7,12 +7,14 @@ import {
   QuestionInterface,
   UpdateQuestionInterface,
 } from './interfaces/question.interface';
-import { Model, ObjectId } from 'mongoose';
+import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CorrectAnswer } from './schemas/correctAnswer.schema';
+import { FilterQuery } from './interfaces/filter.interface';
 
 @Injectable()
 export class QuestionsService {
+
   constructor(
     @InjectModel(Question.name) private readonly questionModel: Model<Question>,
     @InjectModel(CorrectAnswer.name)
@@ -49,11 +51,15 @@ export class QuestionsService {
     return await this.questionModel.find({});
   }
 
-  async findOne(id: number): Promise<Question> {
+  async filter(allQueryParams: FilterQuery) {
+    return this.questionModel.find(allQueryParams);
+  }
+
+  async findOne(id: string): Promise<Question> {
     return await this.questionModel.findById(id);
   }
 
-  update(id: number, updateQuestionDto: UpdateQuestionDto) {
+  update(id: string, updateQuestionDto: UpdateQuestionDto) {
     const newQuestion: UpdateQuestionInterface = {};
     if (updateQuestionDto.subject) {
       newQuestion['subject'] = updateQuestionDto.subject;
@@ -77,7 +83,7 @@ export class QuestionsService {
     return this.questionModel.findByIdAndUpdate(id, newQuestion, { new: true });
   }
 
-  async remove(id: number): Promise<string> {
+  async remove(id: string): Promise<string> {
     const result = await this.questionModel.findByIdAndDelete(id);
     return result ? 'deleted' : 'error deleting';
   }

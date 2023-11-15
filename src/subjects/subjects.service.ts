@@ -33,11 +33,17 @@ export class SubjectsService {
         const subCategory: SubCategory = {
           name: addSubjectDto.subCategory,
         };
-        subCategories.push(subCategory);
-
-        return this.subjectModel.findByIdAndUpdate(id, {
-          subCategories: subCategories,
-        });
+        this.subCategoryModel
+          .create(subCategory)
+          .then((result) => {
+            subCategories.push(result._id.toString());
+            return this.subjectModel.findByIdAndUpdate(id, {
+              subCategories: subCategories,
+            });
+          })
+          .catch((err) => {
+            throw err;
+          });
       })
       .catch((err) => {
         return err;
@@ -49,7 +55,7 @@ export class SubjectsService {
   }
 
   findAll() {
-    return this.subjectModel.find();
+    return this.subjectModel.find().populate('subCategories');
   }
 
   findOne(id: number) {
@@ -57,7 +63,7 @@ export class SubjectsService {
   }
 
   async update(id: number, updateSubjectDto: UpdateSubjectDto) {
-    const subCategoryArray: SubCategory[] = [];
+    const subCategoryArray: string[] = [];
 
     const subject: Subject = {
       name: updateSubjectDto.name,
@@ -72,7 +78,10 @@ export class SubjectsService {
   remove(id: number) {
     this.questionModel.updateMany(
       { subject: id },
-      { subject: 'Other subject id', subCategory: 'Other subject category id' }, // replace id with other object id
+      {
+        subject: '655461b78e66dab790f847da',
+        subCategory: '655461ae8e66dab790f847d7',
+      },
       { new: true },
     );
 
@@ -82,7 +91,7 @@ export class SubjectsService {
   removeSubCategory(id: string, course_id: string) {
     this.questionModel.updateMany(
       { subCategory: course_id },
-      { subCategory: 'Other subject id' }, // replace id with other object id
+      { subCategory: '655461ae8e66dab790f847d7' },
       { new: true },
     );
 

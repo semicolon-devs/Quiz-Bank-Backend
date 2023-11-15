@@ -36,6 +36,7 @@ export class QuestionsService {
       type: createQuestionDto.type,
       question: createQuestionDto.question,
       answers: answersArray,
+      difficulty: createQuestionDto.difficulty,
       correctAnswer: createQuestionDto.correctAnswer,
       explaination: createQuestionDto.explaination
     };
@@ -70,6 +71,9 @@ export class QuestionsService {
     }
     if (updateQuestionDto.answers) {
       newQuestion['answers'] = updateQuestionDto.answers;
+    }
+    if (updateQuestionDto.difficulty) {
+      newQuestion['difficulty'] = updateQuestionDto.difficulty;
     }
     if (updateQuestionDto.correctAnswer) {
       newQuestion['correctAnswer'] = updateQuestionDto.correctAnswer;

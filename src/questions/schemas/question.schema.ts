@@ -14,6 +14,9 @@ export class Question {
   })
   subject: string;
 
+  @Prop()
+  difficulty: string
+
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'SubCategory',

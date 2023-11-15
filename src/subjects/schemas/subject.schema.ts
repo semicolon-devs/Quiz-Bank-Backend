@@ -9,8 +9,15 @@ export class Subject {
   @Prop({ type: String, unique: true, required: true })
   name: string;
 
-  @Prop([{ type: SubCategory, required: true, default: [] }])
-  subCategories: SubCategory[];
+  @Prop([
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'SubCategory',
+      required: true,
+      default: [],
+    },
+  ])
+  subCategories: string[];
 }
 
 export const SubjectSchema = SchemaFactory.createForClass(Subject);

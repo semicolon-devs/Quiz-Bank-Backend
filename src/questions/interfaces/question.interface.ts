@@ -7,7 +7,7 @@ export interface QuestionInterface {
   type: QuestionType;
   question: string;
   answers: AnswerInterface[];
-  correctAnswer: Number;
+  correctAnswer: Number[];
   explaination: string;
 }
 
@@ -22,6 +22,6 @@ export interface UpdateQuestionInterface {
   type?: QuestionType;
   question?: string;
   answers?: AnswerInterface[];
-  correctAnswer?: Number;
+  correctAnswer?: Number[];
   explaination?: string;
 }

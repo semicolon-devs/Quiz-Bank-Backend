@@ -17,8 +17,6 @@ export class QuestionsService {
 
   constructor(
     @InjectModel(Question.name) private readonly questionModel: Model<Question>,
-    @InjectModel(CorrectAnswer.name)
-    private readonly CorrectAnswerModel: Model<CorrectAnswer>,
   ) {}
 
   async create(createQuestionDto: CreateQuestionDto): Promise<Question> {
@@ -48,7 +46,7 @@ export class QuestionsService {
   }
 
   async findAll(): Promise<Question[]> {
-    return await this.questionModel.find({});
+    return await this.questionModel.find({}).populate('subject').populate('subCategory');
   }
 
   async filter(allQueryParams: FilterQuery) {

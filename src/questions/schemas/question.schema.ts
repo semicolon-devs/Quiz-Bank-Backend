@@ -9,17 +9,17 @@ export type QuestionDocument = HydratedDocument<Question>;
 export class Question {
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'subject',
+    ref: 'Subject',
     required: true,
   })
-  subject: mongoose.Schema.Types.ObjectId;
+  subject: string;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'subCategory',
+    ref: 'SubCategory',
     required: true,
   })
-  subCategory: mongoose.Schema.Types.ObjectId;
+  subCategory: string;
 
   @Prop({ type: String, enum: QuestionType, required: true })
   type: QuestionType;
@@ -30,8 +30,8 @@ export class Question {
   @Prop([{ type: Answer, required: true }])
   answers: Answer[];
 
-  @Prop({ type: Number, required: true })
-  correctAnswer: Number;
+  @Prop([{ type: Number, required: true }])
+  correctAnswer: Number[];
 
   @Prop({type: String, required: true})
   explaination: string;

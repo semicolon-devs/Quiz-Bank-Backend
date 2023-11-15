@@ -14,7 +14,7 @@ export class Question {
   })
   subject: string;
 
-  @Prop()
+  @Prop({type:String, required:true, default: "Easy"})
   difficulty: string
 
   @Prop({

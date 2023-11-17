@@ -3,7 +3,7 @@ import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
 import { Subject, SubjectSchema } from './schemas/subject.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { SubCategory } from './schemas/subCategory.schema';
 import { AddSubjectDto } from './dto/add-subject.dto';
 import { Question } from 'src/questions/schemas/question.schema';
@@ -25,7 +25,7 @@ export class SubjectsService {
     return await this.subjectModel.create(subject);
   }
 
-  async addSubCategory(id: String, addSubjectDto: AddSubjectDto) {
+  async addSubCategory(id: ObjectId, addSubjectDto: AddSubjectDto) {
     this.subjectModel
       .findById(id)
       .then((subject) => {
@@ -62,7 +62,7 @@ export class SubjectsService {
     return this.subjectModel.findById(id);
   }
 
-  async update(id: number, updateSubjectDto: UpdateSubjectDto) {
+  async update(id: ObjectId, updateSubjectDto: UpdateSubjectDto) {
     const subCategoryArray: string[] = [];
 
     const subject: Subject = {
@@ -75,7 +75,7 @@ export class SubjectsService {
     });
   }
 
-  remove(id: number) {
+  remove(id: ObjectId) {
     this.questionModel.updateMany(
       { subject: id },
       {
@@ -88,7 +88,7 @@ export class SubjectsService {
     return this.subjectModel.findByIdAndUpdate(id);
   }
 
-  removeSubCategory(id: string, course_id: string) {
+  removeSubCategory(id: ObjectId, course_id: string) {
     this.questionModel.updateMany(
       { subCategory: course_id },
       { subCategory: '655461ae8e66dab790f847d7' },

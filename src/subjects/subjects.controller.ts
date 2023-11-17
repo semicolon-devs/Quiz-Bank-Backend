@@ -11,6 +11,8 @@ import { SubjectsService } from './subjects.service';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
 import { AddSubjectDto } from './dto/add-subject.dto';
+import { ObjectId } from 'mongoose';
+import { ParseObjectIdPipe } from 'src/utils/validation/parseObjectIDPipe';
 
 @Controller('/api/v1/subjects')
 export class SubjectsController {
@@ -23,7 +25,7 @@ export class SubjectsController {
 
   @Post('courses/:id')
   addSubCategory(
-    @Param('id') id: string,
+    @Param('id', ParseObjectIdPipe) id: ObjectId,
     @Body() addSubjectDto: AddSubjectDto,
   ) {
     return this.subjectsService.addSubCategory(id, addSubjectDto);
@@ -41,23 +43,23 @@ export class SubjectsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseObjectIdPipe) id: ObjectId) {
     return this.subjectsService.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSubjectDto: UpdateSubjectDto) {
-    return this.subjectsService.update(+id, updateSubjectDto);
+  update(@Param('id', ParseObjectIdPipe) id: ObjectId, @Body() updateSubjectDto: UpdateSubjectDto) {
+    return this.subjectsService.update(id, updateSubjectDto);
   }
 
   // TODO: delete route to delete sub category only; removing subject should assign all questions to other subject category
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.subjectsService.remove(+id);
+  remove(@Param('id', ParseObjectIdPipe) id: ObjectId) {
+    return this.subjectsService.remove(id);
   }
 
     @Delete('/:id/:course_id')
-    removeSubCategory(@Param('id') id: string, @Param('course_id') course_id: string) {
+    removeSubCategory(@Param('id', ParseObjectIdPipe) id: ObjectId, @Param('course_id', ParseObjectIdPipe) course_id: string) {
       return this.subjectsService.removeSubCategory(id, course_id);
     }
 }

@@ -7,6 +7,7 @@ import { Model, ObjectId } from 'mongoose';
 import { SubCategory } from './schemas/subCategory.schema';
 import { AddSubjectDto } from './dto/add-subject.dto';
 import { Question } from 'src/questions/schemas/question.schema';
+import { UpdateSubCategoryDto } from './dto/update-subcategory.dto';
 
 @Injectable()
 export class SubjectsService {
@@ -58,8 +59,8 @@ export class SubjectsService {
     return this.subjectModel.find().populate('subCategories');
   }
 
-  findOne(id: number) {
-    return this.subjectModel.findById(id);
+  findOne(id: ObjectId) {
+    return this.subjectModel.findById(id).populate('subCategories');
   }
 
   async update(id: ObjectId, updateSubjectDto: UpdateSubjectDto) {
@@ -74,30 +75,40 @@ export class SubjectsService {
       new: true,
     });
   }
+  
+  async updateSubCategory(id: ObjectId, updateSubCategoryDto: UpdateSubCategoryDto) {
+    const subCategory: SubCategory = {
+      name: updateSubCategoryDto.name,
+    };
+
+    return await this.subjectModel.findByIdAndUpdate(id, subCategory, {
+      new: true,
+    });
+  }
 
   remove(id: ObjectId) {
     this.questionModel.updateMany(
       { subject: id },
       {
-        subject: '655461b78e66dab790f847da',
-        subCategory: '655461ae8e66dab790f847d7',
+        subject: '655461b78e66dab790f847da', // id of the subject named other
+        subCategory: '6557a4aabe2e7d4365a1ec8a', // id of the subject category named other
       },
       { new: true },
     );
 
-    return this.subjectModel.findByIdAndUpdate(id);
+    return this.subjectModel.findByIdAndDelete(id);
   }
 
   removeSubCategory(id: ObjectId, course_id: string) {
     this.questionModel.updateMany(
       { subCategory: course_id },
-      { subCategory: '655461ae8e66dab790f847d7' },
+      { subCategory: '6557a4aabe2e7d4365a1ec8a' }, // id of the subject category named other
       { new: true },
     );
 
     return this.subjectModel.findByIdAndUpdate(
       id,
-      { $pull: { subCategories: { _id: course_id } } },
+      { $pull: { subCategories: course_id } },
       { new: true },
     );
   }

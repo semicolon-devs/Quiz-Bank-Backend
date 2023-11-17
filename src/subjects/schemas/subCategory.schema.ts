@@ -5,7 +5,7 @@ export type QuestionDocument = HydratedDocument<SubCategory>;
 
 @Schema()
 export class SubCategory {
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, unique: true, required: true })
   name: string;
 }
 

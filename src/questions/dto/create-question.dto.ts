@@ -1,15 +1,19 @@
+import { ObjectId } from 'mongoose';
 import { QuestionType } from 'src/enums/questionType.enum';
-import { Subject } from 'src/enums/subjects.enum';
 
 export class CreateQuestionDto {
-  readonly subject: Subject;
-  readonly category: string;
+  readonly subject: ObjectId;
+  readonly subCategory: ObjectId;
   readonly type: QuestionType;
   readonly question: string;
-  readonly answers: [Answer];
+  readonly answers: Answer[];
+  readonly difficulty: string;
+  readonly correctAnswer: Number[];
+  readonly explaination: string;
 }
 
 class Answer {
     readonly number: Number;
-    readonly text: string;
+    readonly answer: string;
 }
+

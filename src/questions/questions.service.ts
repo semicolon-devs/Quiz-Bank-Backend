@@ -1,53 +1,92 @@
 import { Injectable } from '@nestjs/common';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
-import { Question, QuestionSchema } from './schemas/question.schema';
-import { Answer } from './schemas/answer.schema';
+import { Question } from './schemas/question.schema';
+import {
+  AnswerInterface,
+  QuestionInterface,
+  UpdateQuestionInterface,
+} from './interfaces/question.interface';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { error } from 'console';
+import { CorrectAnswer } from './schemas/correctAnswer.schema';
+import { FilterQuery } from './interfaces/filter.interface';
 
 @Injectable()
 export class QuestionsService {
+
   constructor(
     @InjectModel(Question.name) private readonly questionModel: Model<Question>,
   ) {}
 
-  create(createQuestionDto: CreateQuestionDto) : Promise<Question> {
-    const answersArray: Answer[] = [];
-    createQuestionDto.answers.forEach((item) => {
-      const answer : Answer = {
-        number: item.number,
-        answer: item.text,
-      }
-      answersArray.push(answer);
-    })
+  async create(createQuestionDto: CreateQuestionDto): Promise<Question> {
+    const answersArray: AnswerInterface[] = [];
 
-    const question: Question = {
+    createQuestionDto.answers.forEach(async (item) => {
+      const answer: AnswerInterface = {
+        number: item.number,
+        answer: item.answer,
+      };
+
+      answersArray.push(answer);
+    });
+    const question: QuestionInterface = {
       subject: createQuestionDto.subject,
-      category: createQuestionDto.category,
+      subCategory: createQuestionDto.subCategory,
       type: createQuestionDto.type,
       question: createQuestionDto.question,
-      answers: answersArray
-    }
+      answers: answersArray,
+      difficulty: createQuestionDto.difficulty,
+      correctAnswer: createQuestionDto.correctAnswer,
+      explaination: createQuestionDto.explaination
+    };
 
     const createdQuestion = this.questionModel.create(question);
     return createdQuestion;
+  
   }
 
-  findAll() {
-    return `This action returns all questions`;
+  async findAll(): Promise<Question[]> {
+    return await this.questionModel.find({}).populate('subject').populate('subCategory');
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} question`;
+  async filter(allQueryParams: FilterQuery) {
+    return this.questionModel.find(allQueryParams);
   }
 
-  update(id: number, updateQuestionDto: UpdateQuestionDto) {
-    return `This action updates a #${id} question`;
+  async findOne(id: string): Promise<Question> {
+    return await this.questionModel.findById(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} question`;
+  update(id: string, updateQuestionDto: UpdateQuestionDto) {
+    const newQuestion: UpdateQuestionInterface = {};
+    if (updateQuestionDto.subject) {
+      newQuestion['subject'] = updateQuestionDto.subject;
+    }
+    if (updateQuestionDto.subCategory) {
+      newQuestion['subCategory'] = updateQuestionDto.subCategory;
+    }
+    if (updateQuestionDto.question) {
+      newQuestion['question'] = updateQuestionDto.question;
+    }
+    if (updateQuestionDto.answers) {
+      newQuestion['answers'] = updateQuestionDto.answers;
+    }
+    if (updateQuestionDto.difficulty) {
+      newQuestion['difficulty'] = updateQuestionDto.difficulty;
+    }
+    if (updateQuestionDto.correctAnswer) {
+      newQuestion['correctAnswer'] = updateQuestionDto.correctAnswer;
+    }
+    if (updateQuestionDto.explaination) {
+      newQuestion['explaination'] = updateQuestionDto.explaination;
+    }
+
+    return this.questionModel.findByIdAndUpdate(id, newQuestion, { new: true });
+  }
+
+  async remove(id: string): Promise<string> {
+    const result = await this.questionModel.findByIdAndDelete(id);
+    return result ? 'deleted' : 'error deleting';
   }
 }

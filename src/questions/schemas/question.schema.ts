@@ -33,10 +33,10 @@ export class Question {
   @Prop([{ type: Answer, required: true }])
   answers: Answer[];
 
-  @Prop([{ type: Number, max: 80 * 1024 * 1024, required: true }])
+  @Prop([{ type: Number, required: true }])
   correctAnswer: Number[];
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, maxlength: 20 * 1024 * 1024, required: true })
   explaination: string;
 }
 

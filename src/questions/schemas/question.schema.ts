@@ -14,8 +14,8 @@ export class Question {
   })
   subject: string;
 
-  @Prop({type:String, required:true, default: "Easy"})
-  difficulty: string
+  @Prop({ type: String, required: true, default: 'Easy' })
+  difficulty: string;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
@@ -33,10 +33,10 @@ export class Question {
   @Prop([{ type: Answer, required: true }])
   answers: Answer[];
 
-  @Prop([{ type: Number, required: true }])
+  @Prop([{ type: Number, max: 80 * 1024 * 1024, required: true }])
   correctAnswer: Number[];
 
-  @Prop({type: String, required: true})
+  @Prop({ type: String, required: true })
   explaination: string;
 }
 

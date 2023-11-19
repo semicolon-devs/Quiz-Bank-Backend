@@ -12,6 +12,8 @@ import { QuestionsService } from './questions.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
 import { FilterQuery } from './interfaces/filter.interface';
+import { ParseObjectIdPipe } from 'src/utils/validation/parseObjectIDPipe';
+import { ObjectId } from 'mongoose';
 
 @Controller('api/v1/questions')
 export class QuestionsController {
@@ -39,14 +41,14 @@ export class QuestionsController {
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ParseObjectIdPipe) id: ObjectId,
     @Body() updateQuestionDto: UpdateQuestionDto,
   ) {
     return this.questionsService.update(id, updateQuestionDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseObjectIdPipe) id: ObjectId) {
     return this.questionsService.remove(id);
   }
 }

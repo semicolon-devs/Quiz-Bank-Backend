@@ -7,7 +7,7 @@ import {
   QuestionInterface,
   UpdateQuestionInterface,
 } from './interfaces/question.interface';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CorrectAnswer } from './schemas/correctAnswer.schema';
 import { FilterQuery } from './interfaces/filter.interface';
@@ -58,7 +58,7 @@ export class QuestionsService {
     return await this.questionModel.findById(id);
   }
 
-  update(id: string, updateQuestionDto: UpdateQuestionDto) {
+  update(id: ObjectId, updateQuestionDto: UpdateQuestionDto) {
     const newQuestion: UpdateQuestionInterface = {};
     if (updateQuestionDto.subject) {
       newQuestion['subject'] = updateQuestionDto.subject;
@@ -85,7 +85,7 @@ export class QuestionsService {
     return this.questionModel.findByIdAndUpdate(id, newQuestion, { new: true });
   }
 
-  async remove(id: string): Promise<string> {
+  async remove(id: ObjectId): Promise<string> {
     const result = await this.questionModel.findByIdAndDelete(id);
     return result ? 'deleted' : 'error deleting';
   }

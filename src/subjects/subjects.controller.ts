@@ -10,10 +10,11 @@ import {
 import { SubjectsService } from './subjects.service';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
-import { AddSubjectDto } from './dto/add-subject.dto';
+import { AddSubCategoryDto } from './dto/add-subcategory.dto';
 import { ObjectId } from 'mongoose';
 import { ParseObjectIdPipe } from 'src/utils/validation/parseObjectIDPipe';
 import { UpdateSubCategoryDto } from './dto/update-subcategory.dto';
+import { AddModuleDto } from './dto/add-module.dto';
 
 @Controller('/api/v1/subjects')
 export class SubjectsController {
@@ -27,9 +28,17 @@ export class SubjectsController {
   @Post('courses/:id')
   addSubCategory(
     @Param('id', ParseObjectIdPipe) id: ObjectId,
-    @Body() addSubjectDto: AddSubjectDto,
+    @Body() addSubjectDto: AddSubCategoryDto,
   ) {
     return this.subjectsService.addSubCategory(id, addSubjectDto);
+  }
+
+  @Post('module/:id')
+  addModule(
+    @Param('id', ParseObjectIdPipe) id: ObjectId,
+    @Body() addModuleDto: AddModuleDto,
+  ) {
+    return this.subjectsService.addModule(id, addModuleDto);
   }
 
   @Get()

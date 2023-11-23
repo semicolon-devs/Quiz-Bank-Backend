@@ -7,14 +7,12 @@ import {
   QuestionInterface,
   UpdateQuestionInterface,
 } from './interfaces/question.interface';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { CorrectAnswer } from './schemas/correctAnswer.schema';
 import { FilterQuery } from './interfaces/filter.interface';
 
 @Injectable()
 export class QuestionsService {
-
   constructor(
     @InjectModel(Question.name) private readonly questionModel: Model<Question>,
   ) {}
@@ -33,32 +31,44 @@ export class QuestionsService {
     const question: QuestionInterface = {
       subject: createQuestionDto.subject,
       subCategory: createQuestionDto.subCategory,
+      module: createQuestionDto.module,
       type: createQuestionDto.type,
       question: createQuestionDto.question,
       answers: answersArray,
       difficulty: createQuestionDto.difficulty,
       correctAnswer: createQuestionDto.correctAnswer,
-      explaination: createQuestionDto.explaination
+      explaination: createQuestionDto.explaination,
     };
 
     const createdQuestion = this.questionModel.create(question);
     return createdQuestion;
-  
   }
 
   async findAll(): Promise<Question[]> {
-    return await this.questionModel.find({}).populate('subject').populate('subCategory');
+    return await this.questionModel
+      .find({})
+      .populate('subject')
+      .populate('subCategory')
+      .populate('module');
   }
 
   async filter(allQueryParams: FilterQuery) {
-    return this.questionModel.find(allQueryParams);
+    return this.questionModel
+      .find(allQueryParams)
+      .populate('subject')
+      .populate('subCategory')
+      .populate('module');
   }
 
-  async findOne(id: string): Promise<Question> {
-    return await this.questionModel.findById(id);
+  async findOne(id: ObjectId): Promise<Question> {
+    return await this.questionModel
+      .findById(id)
+      .populate('subject')
+      .populate('subCategory')
+      .populate('module');
   }
 
-  update(id: string, updateQuestionDto: UpdateQuestionDto) {
+  async update(id: ObjectId, updateQuestionDto: UpdateQuestionDto) {
     const newQuestion: UpdateQuestionInterface = {};
     if (updateQuestionDto.subject) {
       newQuestion['subject'] = updateQuestionDto.subject;
@@ -85,7 +95,7 @@ export class QuestionsService {
     return this.questionModel.findByIdAndUpdate(id, newQuestion, { new: true });
   }
 
-  async remove(id: string): Promise<string> {
+  async remove(id: ObjectId): Promise<string> {
     const result = await this.questionModel.findByIdAndDelete(id);
     return result ? 'deleted' : 'error deleting';
   }

@@ -68,7 +68,7 @@ export class QuestionsService {
       .populate('module');
   }
 
-  async update(id: ObjectId, updateQuestionDto: UpdateQuestionDto) {
+  update(id: ObjectId, updateQuestionDto: UpdateQuestionDto) {
     const newQuestion: UpdateQuestionInterface = {};
     if (updateQuestionDto.subject) {
       newQuestion['subject'] = updateQuestionDto.subject;

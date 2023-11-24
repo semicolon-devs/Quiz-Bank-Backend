@@ -11,9 +11,8 @@ import {
 import { QuestionsService } from './questions.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
-import { FilterQuery } from './interfaces/filter.interface';
-import { ObjectId } from 'mongoose';
 import { ParseObjectIdPipe } from 'src/utils/validation/parseObjectIDPipe';
+import { ObjectId } from 'mongoose';
 import { FilterDTO } from './dto/filter.dto';
 
 @Controller('api/v1/questions')

@@ -13,6 +13,7 @@ import { Module } from './schemas/module.schema';
 import { SubCategoryInterface } from './interfaces/subCategory.interface';
 import { SubjectInterface } from './interfaces/subject.interface';
 import { ModuleInterface } from './interfaces/module.interface';
+import { UpdateModuleDto } from './dto/update-module.dto';
 
 @Injectable()
 export class SubjectsService {
@@ -117,7 +118,20 @@ export class SubjectsService {
       name: updateSubCategoryDto.name,
     };
 
-    return await this.subjectModel.findByIdAndUpdate(id, subCategory, {
+    return await this.subCategoryModel.findByIdAndUpdate(id, subCategory, {
+      new: true,
+    });
+  }
+
+  async updateModule(
+    id: ObjectId,
+    updateModuleDto: UpdateModuleDto,
+  ) {
+    const module: SubCategoryInterface = {
+      name: updateModuleDto.name,
+    };
+
+    return await this.moduleModel.findByIdAndUpdate(id, module, {
       new: true,
     });
   }
@@ -135,7 +149,7 @@ export class SubjectsService {
     return this.subjectModel.findByIdAndDelete(id);
   }
 
-  removeSubCategory(id: ObjectId, course_id: string) {
+  removeSubCategory(id: ObjectId, course_id: ObjectId) {
     this.questionModel.updateMany(
       { subCategory: course_id },
       { subCategory: '6557a4aabe2e7d4365a1ec8a' }, // id of the subject category named other
@@ -149,7 +163,7 @@ export class SubjectsService {
     );
   }
 
-  removeModule(id: ObjectId, module_id: string) {
+  removeModule(id: ObjectId, module_id: ObjectId) {
     this.questionModel.updateMany(
       { module: module_id },
       { module: '' }, // id of the subject category named other

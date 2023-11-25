@@ -10,10 +10,12 @@ import {
 import { SubjectsService } from './subjects.service';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
-import { AddSubjectDto } from './dto/add-subject.dto';
+import { AddSubCategoryDto } from './dto/add-subcategory.dto';
 import { ObjectId } from 'mongoose';
 import { ParseObjectIdPipe } from 'src/utils/validation/parseObjectIDPipe';
 import { UpdateSubCategoryDto } from './dto/update-subcategory.dto';
+import { AddModuleDto } from './dto/add-module.dto';
+import { UpdateModuleDto } from './dto/update-module.dto';
 
 @Controller('/api/v1/subjects')
 export class SubjectsController {
@@ -27,9 +29,17 @@ export class SubjectsController {
   @Post('courses/:id')
   addSubCategory(
     @Param('id', ParseObjectIdPipe) id: ObjectId,
-    @Body() addSubjectDto: AddSubjectDto,
+    @Body() addSubjectDto: AddSubCategoryDto,
   ) {
     return this.subjectsService.addSubCategory(id, addSubjectDto);
+  }
+
+  @Post('module/:id')
+  addModule(
+    @Param('id', ParseObjectIdPipe) id: ObjectId,
+    @Body() addModuleDto: AddModuleDto,
+  ) {
+    return this.subjectsService.addModule(id, addModuleDto);
   }
 
   @Get()
@@ -55,6 +65,7 @@ export class SubjectsController {
     return this.subjectsService.update(id, updateSubjectDto);
   }
 
+  @Patch('courses/:id')
   updateSubCategory(
     @Param('id', ParseObjectIdPipe) id: ObjectId,
     @Body() updateSubCategoryDto: UpdateSubCategoryDto,
@@ -62,16 +73,32 @@ export class SubjectsController {
     return this.subjectsService.updateSubCategory(id, updateSubCategoryDto);
   }
 
+  @Patch('module/:id')
+  updateModule(
+    @Param('id', ParseObjectIdPipe) id: ObjectId,
+    @Body() updateModeluDto: UpdateModuleDto,
+  ) {
+    return this.subjectsService.updateModule(id, updateModeluDto);
+  }
+
   @Delete(':id')
   remove(@Param('id', ParseObjectIdPipe) id: ObjectId) {
     return this.subjectsService.remove(id);
   }
 
-  @Delete('/:id/:course_id')
+  @Delete('courses/:id/:course_id')
   removeSubCategory(
     @Param('id', ParseObjectIdPipe) id: ObjectId,
-    @Param('course_id', ParseObjectIdPipe) course_id: string,
+    @Param('course_id', ParseObjectIdPipe) course_id: ObjectId,
   ) {
     return this.subjectsService.removeSubCategory(id, course_id);
+  }
+
+  @Delete('module/:course_id/:module_id')
+  removeModule(
+    @Param('course_id', ParseObjectIdPipe) course_id: ObjectId,
+    @Param('module_id', ParseObjectIdPipe) module_id: ObjectId,
+  ) {
+    return this.subjectsService.removeModule(course_id, module_id);
   }
 }

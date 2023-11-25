@@ -11,7 +11,9 @@ import {
 import { QuestionsService } from './questions.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
-import { FilterQuery } from './interfaces/filter.interface';
+import { ParseObjectIdPipe } from 'src/utils/validation/parseObjectIDPipe';
+import { ObjectId } from 'mongoose';
+import { FilterDTO } from './dto/filter.dto';
 
 @Controller('api/v1/questions')
 export class QuestionsController {
@@ -27,26 +29,26 @@ export class QuestionsController {
     return this.questionsService.findAll();
   }
 
-  @Get()
-  filter(@Query() allQueryParams: FilterQuery) {
+  @Get('filter')
+  filter(@Query() allQueryParams: FilterDTO) {
     return this.questionsService.filter(allQueryParams);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseObjectIdPipe) id: ObjectId) {
     return this.questionsService.findOne(id);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ParseObjectIdPipe) id: ObjectId,
     @Body() updateQuestionDto: UpdateQuestionDto,
   ) {
     return this.questionsService.update(id, updateQuestionDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseObjectIdPipe) id: ObjectId) {
     return this.questionsService.remove(id);
   }
 }

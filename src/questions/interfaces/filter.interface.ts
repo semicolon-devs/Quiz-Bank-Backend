@@ -1,4 +1,5 @@
 export interface FilterQuery {
-    readonly subject?: string,
-    readonly subCategory?: string,
+  subject?: string;
+  subCategory?: string;
+  module?: string;
 }

@@ -14,15 +14,22 @@ export class Question {
   })
   subject: string;
 
-  @Prop({ type: String, required: true, default: 'Easy' })
-  difficulty: string;
-
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'SubCategory',
     required: true,
   })
   subCategory: string;
+
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Module',
+    required: true,
+  })
+  module: string;
+
+  @Prop({ type: String, required: true, default: 'Easy' })
+  difficulty: string;
 
   @Prop({ type: String, enum: QuestionType, required: true })
   type: QuestionType;
@@ -33,10 +40,10 @@ export class Question {
   @Prop([{ type: Answer, required: true }])
   answers: Answer[];
 
-  @Prop([{ type: Number, max: 80 * 1024 * 1024, required: true }])
+  @Prop([{ type: Number, required: true }])
   correctAnswer: Number[];
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, maxlength: 20 * 1024 * 1024, required: true })
   explaination: string;
 }
 

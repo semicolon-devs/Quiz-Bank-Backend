@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -34,6 +35,11 @@ export class PapersController {
     return this.papersService.findAll();
   }
 
+  @Get(':id')
+  findOne(@Param('id', ParseObjectIdPipe) id:ObjectId) {
+    return this.papersService.findOne(id);
+  }
+
   @Get(':paper_id/:question_index')
   getQuestion(
     @Param('paper_id', ParseObjectIdPipe) paperId: ObjectId,
@@ -48,5 +54,13 @@ export class PapersController {
     @Param('question_index') question_index: number,
   ) {
     return this.papersService.findAnswer(paperId, question_index);
+  }
+
+  @Delete(':paper_id/:question_index')
+  removeQuestion(
+    @Param('paper_id', ParseObjectIdPipe) paperId: ObjectId,
+    @Param('question_index') question_index: number,
+  ) {
+    return this.papersService.removeQuestion(paperId, question_index);
   }
 }

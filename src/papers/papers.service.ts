@@ -51,6 +51,10 @@ export class PapersService {
     return this.paperModel.find({});
   }
 
+  findOne(id: ObjectId) {
+    return this.paperModel.findById(id);
+  }
+
   async findQuestion(paperId: ObjectId, question_index: number) {
     try {
       const questions = await this.paperModel
@@ -67,7 +71,6 @@ export class PapersService {
     }
   }
 
-  
   async findAnswer(paperId: ObjectId, question_index: number) {
     try {
       const questions = await this.paperModel
@@ -76,11 +79,31 @@ export class PapersService {
       const questionIds: Array<string> = Array.from(questions.questions);
       return this.questionModel
         .findById(questionIds.at(question_index - 1))
-        .select(
-          'correctAnswer explaination -_id',
-        );
+        .select('correctAnswer explaination -_id');
     } catch (err) {
       throw err;
     }
+  }
+
+  removeQuestion(paperId: ObjectId, question_index: number) {
+    this.paperModel
+      .findById(paperId)
+      .select('questions -_id')
+      .then((questions) => {
+        const questionIdArray: Set<string> = new Set(questions.questions);
+
+        questionIdArray.delete(
+          Array.from(questionIdArray).at(question_index - 1),
+        );
+
+        return this.paperModel.findByIdAndUpdate(
+          paperId,
+          { questions: Array.from(questionIdArray) },
+          { new: true },
+        );
+      })
+      .catch((err) => {
+        throw err;
+      });
   }
 }

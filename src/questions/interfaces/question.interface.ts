@@ -4,6 +4,7 @@ import { QuestionType } from 'src/enums/questionType.enum';
 export interface QuestionInterface {
   subject: ObjectId;
   subCategory: ObjectId;
+  module: ObjectId;
   type: QuestionType;
   question: string;
   answers: AnswerInterface[];

@@ -1,3 +1,3 @@
-export class AddSubjectDto {
+export class AddSubCategoryDto {
     readonly subCategory: string;
 }

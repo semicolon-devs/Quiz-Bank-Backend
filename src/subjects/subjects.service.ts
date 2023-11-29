@@ -127,7 +127,7 @@ export class SubjectsService {
     id: ObjectId,
     updateModuleDto: UpdateModuleDto,
   ) {
-    const module: SubCategoryInterface = {
+    const module: ModuleInterface = {
       name: updateModuleDto.name,
     };
 

@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { UpdatePasswordDto } from './dto/updatePassword.dto';
 import { User } from 'src/users/schemas/user.schema';
 import * as bcrypt from 'bcrypt';
+import { UserInterface } from 'src/users/interfaces/user.interface';
 
 @Injectable()
 export class AuthService {
@@ -24,8 +25,8 @@ export class AuthService {
     return null;
   }
 
-  async login(user: User) {
-    return await this.getTokens(user.email, user.username);
+  async login(user: UserInterface) {
+    return await this.getTokens(user.email, user.email);
   }
 
   async refreshTokens(user: any) {

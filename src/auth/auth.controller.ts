@@ -15,6 +15,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
 import { Role } from 'src/enums/roles.enum';
 import { Roles } from './decorator/roles.decorator';
+import { UserInterface } from 'src/users/interfaces/user.interface';
 
 @Controller('api/v1/auth')
 export class AuthController {
@@ -24,22 +25,22 @@ export class AuthController {
   ) {}
 
   @Post('register')
-  async register(@Body() registerDto: RegisterDto) {
-    await this.usersService.create(registerDto, [Role.USER]);
+  async register(@Body() registerDto: RegisterDto) : Promise<UserInterface> {
+    return await this.usersService.create(registerDto, [Role.USER]);
   }
 
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN)
   @Post('register-moderator')
   async moderatorRegister(@Body() registerDto: RegisterDto) {
-    await this.usersService.create(registerDto, [Role.USER, Role.MODERATOR]);
+    return await this.usersService.create(registerDto, [Role.USER, Role.MODERATOR]);
   }
 
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN)
   @Post('register-admin')
-  async adminRegister(@Body() registerDto: RegisterDto) {
-    await this.usersService.create(registerDto, [
+  async adminRegister(@Body() registerDto: RegisterDto) : Promise<any> {
+    return await this.usersService.create(registerDto, [
       Role.USER,
       Role.MODERATOR,
       Role.ADMIN,
@@ -48,27 +49,27 @@ export class AuthController {
 
   @UseGuards(JwtRefreshAuthGuard)
   @Post('refresh-token')
-  async refreshToken(@Request() request: any) {
+  async refreshToken(@Request() request: any) : Promise<any> {
     return this.authService.refreshTokens(request.user);
   }
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(200)
-  async login(@Request() request: any) {
+  async login(@Request() request: any) : Promise<any> {
     return this.authService.login(request.user);
   }
 
   @UseGuards(LocalAuthGuard)
   @Post('reset-password')
   @HttpCode(200)
-  async passwordReset(@Request() req: any) {
+  async passwordReset(@Request() req: any) : Promise<any> {
     return this.authService.resetPassword(req.user, req.Body);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('user-details')
-  async getUserDetails(@Request() req: any) {
+  async getUserDetails(@Request() req: any) : Promise<UserInterface> {
     return req.user;
   }
 }

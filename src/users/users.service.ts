@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { RegisterDto } from 'src/auth/dto/register.dto';
 import * as bcrypt from 'bcrypt';
 import { Role } from 'src/enums/roles.enum';
+import { UserInterface } from './interfaces/user.interface';
 
 const saltOrRounds = 10;
 
@@ -14,13 +15,15 @@ export class UsersService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
-  async create(registerDto: RegisterDto, roles: Role[]): Promise<User> {
+  async create(
+    registerDto: RegisterDto,
+    roles: Role[],
+  ): Promise<UserInterface> {
     const hash = await bcrypt.hash(registerDto.password, saltOrRounds);
 
-    const user: User = {
+    const user: UserInterface = {
       firstname: registerDto.firstname,
       lastname: registerDto.lastname,
-      username: registerDto.username,
       email: registerDto.email,
       roles: roles,
       password: hash,
@@ -29,7 +32,10 @@ export class UsersService {
     return createdUser;
   }
 
-  async updatePasssword(email: any, newPassword: string): Promise<User | null> {
+  async updatePasssword(
+    email: any,
+    newPassword: string,
+  ): Promise<UserInterface> {
     const hash = await bcrypt.hash(newPassword, saltOrRounds);
 
     return this.userModel
@@ -37,11 +43,11 @@ export class UsersService {
       .exec();
   }
 
-  async findOne(email: string): Promise<User | null> {
+  async findOne(email: string): Promise<UserInterface> {
     return this.userModel.findOne({ email: email }).exec();
   }
 
-  async delete(id: string) {
+  async delete(id: string): Promise<UserInterface> {
     const deletedUser = await this.userModel
       .findByIdAndRemove({ _id: id })
       .exec();

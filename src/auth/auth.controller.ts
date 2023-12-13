@@ -56,8 +56,8 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(200)
-  async login(@Request() request: any) : Promise<any> {
-    return this.authService.login(request.user);
+  async login(@Request() request: any) : Promise<any> {   
+    return this.authService.login(request.user._doc);
   }
 
   @UseGuards(LocalAuthGuard)
@@ -70,6 +70,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('user-details')
   async getUserDetails(@Request() req: any) : Promise<UserInterface> {
-    return req.user;
+    const {firstname, lastname, email, roles} = req.user;    
+    return {firstname, lastname, email, roles};
   }
 }

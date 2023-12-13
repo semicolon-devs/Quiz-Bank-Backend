@@ -25,8 +25,8 @@ export class AuthService {
     return null;
   }
 
-  async login(user: UserInterface) {
-    return await this.getTokens(user.email, user.email);
+  async login(user: UserInterface) {   
+    return await this.getTokens(user.email, user.firstname);
   }
 
   async refreshTokens(user: any) {
@@ -37,29 +37,29 @@ export class AuthService {
     this.usersService.updatePasssword(user.email, requestDto.newPassword);
     return this.login(user);
   }
-  async getTokens(userId: string, username: string) {
-    const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(
-        {
-          sub: userId,
-          username,
-        },
-        {
-          secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-          expiresIn: '15m',
-        },
-      ),
-      this.jwtService.signAsync(
-        {
-          sub: userId,
-          username,
-        },
-        {
-          secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-          expiresIn: '7d',
-        },
-      ),
-    ]);
+
+  async getTokens(email: string, firstname: string) {   
+    const accessToken = this.jwtService.sign(
+      {
+        email: email,
+        username: firstname,
+      },
+      {
+        secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+        expiresIn: '15m',
+      },
+    );
+
+    const refreshToken = this.jwtService.sign(
+      {
+        email: email,
+        username: firstname,
+      },
+      {
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        expiresIn: '7d',
+      },
+    );
 
     return {
       accessToken,

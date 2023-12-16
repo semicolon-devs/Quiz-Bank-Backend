@@ -47,9 +47,10 @@ export class QuestionsService {
   async findAll(): Promise<Question[]> {
     return await this.questionModel
       .find({})
-      .populate('subject')
-      .populate('subCategory')
-      .populate('module');
+      .select('difficulty type question subject subCategory module')
+      .populate('subject', 'name -_id')
+      .populate('subCategory', 'name -_id')
+      .populate('module', 'name -_id');
   }
 
   async filter(allQueryParams: FilterQuery) {

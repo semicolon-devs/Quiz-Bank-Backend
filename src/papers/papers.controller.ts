@@ -80,4 +80,11 @@ export class PapersController {
   ) {
     return this.papersService.removeQuestion(paperId, question_index);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN, Role.MODERATOR)
+  @Delete(':paper_id')
+  removePaper(@Param('paper_id', ParseObjectIdPipe) paperId: ObjectId) {
+    return this.papersService.removePaper(paperId);
+  }
 }

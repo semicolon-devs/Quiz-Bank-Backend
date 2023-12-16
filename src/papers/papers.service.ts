@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paper } from './schemas/paper.schema';
-import { Model, ObjectId } from 'mongoose';
-import { CreatePaperInterface } from './interfaces/createPaper.interface';
+import { Model, ObjectId, Schema } from 'mongoose';
+import { PaperInterface } from './interfaces/createPaper.interface';
 import { CreatePaperDto } from './dto/create-paper.dto';
 import { AddQuestionsDto } from './dto/add-questions.dto';
 import { Question } from 'src/questions/schemas/question.schema';
@@ -17,9 +17,11 @@ export class PapersService {
   ) {}
 
   create(createPaperDto: CreatePaperDto) {
-    const paper: CreatePaperInterface = {
+    const paper: PaperInterface = {
       paperId: createPaperDto.paperId,
+      name: createPaperDto.name,
       timeInMinutes: createPaperDto.timeInMinutes,
+      isTimed: createPaperDto.isTimed,
       paperType: createPaperDto.paperType,
     };
 
@@ -48,7 +50,7 @@ export class PapersService {
   }
 
   findAll() {
-    return this.paperModel.find({});
+    return this.paperModel.find({}).populate("questions", "question");
   }
 
   findOne(id: ObjectId) {
@@ -105,5 +107,9 @@ export class PapersService {
       .catch((err) => {
         throw err;
       });
+  }
+
+  removePaper(paperId: Schema.Types.ObjectId) {
+    return this.paperModel.findByIdAndRemove(paperId);
   }
 }

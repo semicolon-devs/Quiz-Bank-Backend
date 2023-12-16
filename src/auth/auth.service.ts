@@ -30,7 +30,7 @@ export class AuthService {
   }
 
   async refreshTokens(user: any) {
-    return await this.getTokens(user.email, user.username);
+    return await this.getTokens(user.email, user.firstname);
   }
 
   async resetPassword(user: any, requestDto: UpdatePasswordDto) {

@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 import { Role } from '../../enums/roles.enum';
+import { OTP } from './otp.schema';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -17,6 +18,9 @@ export class User {
 
   @Prop({ type: String, required: true })
   password: string;
+
+  @Prop({type:OTP, required:false})
+  otp : OTP;
 
   @Prop([{ type: String, enum: Role }])
   roles: Role[];

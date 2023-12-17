@@ -13,7 +13,7 @@ import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
 import { AddSubCategoryDto } from './dto/add-subcategory.dto';
 import { ObjectId } from 'mongoose';
-import { ParseObjectIdPipe } from 'src/utils/validation/parseObjectIDPipe';
+import { ParseObjectIdPipe } from 'src/common/utils/validation/parseObjectIDPipe';
 import { UpdateSubCategoryDto } from './dto/update-subcategory.dto';
 import { AddModuleDto } from './dto/add-module.dto';
 import { UpdateModuleDto } from './dto/update-module.dto';

@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -15,6 +16,7 @@ import { AddQuestionsDto } from './dto/add-questions.dto';
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { Role } from 'src/enums/roles.enum';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { UpdatePaper } from './dto/update-paper.dto';
 
 @Controller('api/v1/papers')
 export class PapersController {
@@ -47,7 +49,7 @@ export class PapersController {
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
   @Get(':id')
-  findOne(@Param('id', ParseObjectIdPipe) id:ObjectId) {
+  findOne(@Param('id', ParseObjectIdPipe) id: ObjectId) {
     return this.papersService.findOne(id);
   }
 
@@ -86,5 +88,15 @@ export class PapersController {
   @Delete(':paper_id')
   removePaper(@Param('paper_id', ParseObjectIdPipe) paperId: ObjectId) {
     return this.papersService.removePaper(paperId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN, Role.MODERATOR)
+  @Patch(':paper_id')
+  updatePaper(
+    @Param('paper_id', ParseObjectIdPipe) paperId: ObjectId,
+    @Body() payload: UpdatePaper,
+  ) {
+    return this.papersService.updatePaper(paperId, payload);
   }
 }

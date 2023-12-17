@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { PapersService } from './papers.service';
 import { CreatePaperDto } from './dto/create-paper.dto';
-import { ParseObjectIdPipe } from 'src/utils/validation/parseObjectIDPipe';
+import { ParseObjectIdPipe } from 'src/common/utils/validation/parseObjectIDPipe';
 import { ObjectId } from 'mongoose';
 import { AddQuestionsDto } from './dto/add-questions.dto';
 import { Roles } from 'src/auth/decorator/roles.decorator';

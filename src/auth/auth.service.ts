@@ -6,6 +6,11 @@ import { UpdatePasswordDto } from './dto/updatePassword.dto';
 import { User } from 'src/users/schemas/user.schema';
 import * as bcrypt from 'bcrypt';
 import { UserInterface } from 'src/users/interfaces/user.interface';
+import { ForgetPasswordRequest } from 'src/auth/dto/forget-password.dto';
+import { sendEmail } from 'src/common/services/email.service';
+import { LoginDto } from './dto/login.dto';
+import { PasswordResetDto } from './dto/passwordReset.dto';
+import { ForgetPasswordReset } from './dto/forgetPasswordReset.dto';
 
 @Injectable()
 export class AuthService {
@@ -33,9 +38,24 @@ export class AuthService {
     return await this.getTokens(user.email, user.firstname);
   }
 
-  async resetPassword(user: any, requestDto: UpdatePasswordDto) {
+  async resetPassword(user: UserInterface, requestDto: UpdatePasswordDto) {
     this.usersService.updatePasssword(user.email, requestDto.newPassword);
     return this.login(user);
+  }
+
+  async forgetPasswordRequest(payload: ForgetPasswordRequest) {
+    this.usersService.addOTP(payload)
+    .then((otp) => {     
+      sendEmail(otp, payload.email);
+    })
+    .catch((err) => {
+      throw err;
+    })
+
+  }
+
+  async forgetPasswordReset(payload: ForgetPasswordReset) {
+    this.usersService.resetPasssword(payload);
   }
 
   async getTokens(email: string, firstname: string) {   
@@ -46,7 +66,7 @@ export class AuthService {
       },
       {
         secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-        expiresIn: '15m',
+        expiresIn: '30m',
       },
     );
 
@@ -57,7 +77,7 @@ export class AuthService {
       },
       {
         secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-        expiresIn: '7d',
+        expiresIn: '1d',
       },
     );
 

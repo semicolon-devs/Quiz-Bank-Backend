@@ -67,4 +67,11 @@ export class QuestionsController {
   remove(@Param('id', ParseObjectIdPipe) id: ObjectId) {
     return this.questionsService.remove(id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+  @Get('')
+  getQuestionsStatus() {
+
+  }
 }

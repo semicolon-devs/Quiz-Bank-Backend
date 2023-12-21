@@ -9,6 +9,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { QuestionsModule } from './questions/questions.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { PapersModule } from './papers/papers.module';
+import { AnswersModule } from './answers/answers.module';
 dotenv.config();
 
 @Module({
@@ -25,6 +26,7 @@ dotenv.config();
     QuestionsModule,
     SubjectsModule,
     PapersModule,
+    AnswersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

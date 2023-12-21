@@ -6,10 +6,13 @@ export type AnswerDocument = HydratedDocument<Answer>;
 @Schema()
 export class Answer {
   @Prop({ type: Number, required: true })
-  number: Number;
+  number: number;
 
   @Prop({ type: String, maxlength: 20 * 1024 * 1024, required: true })
   answer: string;
+
+  @Prop({type: Date})
+  answeredAt: Date;
 }
 
 export const AnswerSchema = SchemaFactory.createForClass(Answer);

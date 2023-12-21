@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paper } from './schemas/paper.schema';
 import { Model, ObjectId, Schema } from 'mongoose';
@@ -29,29 +29,42 @@ export class PapersService {
     return this.paperModel.create(paper);
   }
 
-  addQuestion(paper_id: ObjectId, reqDto: AddQuestionsDto) {
-    this.paperModel
-      .findById(paper_id)
-      .then((result) => {
-        const questionIds: Set<string> = new Set(result.questions);
+  async addQuestion(paper_id: ObjectId, reqDto: AddQuestionsDto) {
+    try {
+      const result = await this.paperModel.findById(paper_id);
+      let questionIds: Set<string> = new Set(result.questions);
 
-        reqDto.questionIdArray.forEach((id) => {
-          questionIds.add(id);
-        });
-
-        return this.paperModel.findByIdAndUpdate(
-          paper_id,
-          { questions: Array.from(questionIds) },
-          { new: true },
-        );
-      })
-      .catch((err) => {
-        throw err;
+      reqDto.questionIdArray.forEach((id) => {
+        questionIds.add(id);
       });
+
+      return await this.paperModel.findByIdAndUpdate(
+        paper_id,
+        { $addToSet: { questions: Array.from(questionIds) } },
+        { new: true },
+      );
+    } catch (err) {
+      throw err;
+    }
   }
 
   findAll() {
-    return this.paperModel.find({}).populate("questions", "question");
+    return this.paperModel.find({}).populate({
+      path: 'questions',
+      select: 'question module subCategory subject type difficulty',
+      populate: [{
+        path: 'module',
+        select: 'name -_id'
+      },{
+        path: 'subject',
+        select: 'name -_id'
+      },{
+        path: 'subCategory',
+        select: 'name -_id'
+      },
+    ]
+    });
+    // return this.paperModel.find({}).populate('questions', 'question module subCategory subject difficulty');
   }
 
   findOne(id: ObjectId) {
@@ -88,26 +101,24 @@ export class PapersService {
     }
   }
 
-  removeQuestion(paperId: ObjectId, question_index: number) {
-    this.paperModel
-      .findById(paperId)
-      .select('questions -_id')
-      .then((questions) => {
-        const questionIdArray: Set<string> = new Set(questions.questions);
+  async removeQuestion(paperId: ObjectId, question_index: number) {
+    try {
+      const questions = await this.paperModel
+        .findById(paperId)
+        .select('questions -_id');
+      const questionIdArray: Set<string> = new Set(questions.questions);
 
-        questionIdArray.delete(
-          Array.from(questionIdArray).at(question_index - 1),
-        );
-
-        return this.paperModel.findByIdAndUpdate(
-          paperId,
-          { questions: Array.from(questionIdArray) },
-          { new: true },
-        );
-      })
-      .catch((err) => {
-        throw err;
-      });
+      questionIdArray.delete(
+        Array.from(questionIdArray).at(question_index - 1),
+      );
+      return await this.paperModel.findByIdAndUpdate(
+        paperId,
+        { questions: Array.from(questionIdArray) },
+        { new: true },
+      );
+    } catch (err) {
+      throw err;
+    }
   }
 
   removePaper(paperId: Schema.Types.ObjectId) {

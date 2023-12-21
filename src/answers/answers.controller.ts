@@ -2,9 +2,9 @@ import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Role } from 'src/enums/roles.enum';
-import { ParseObjectIdPipe } from 'src/utils/validation/parseObjectIDPipe';
 import { AnswersService } from './answers.service';
 import { FinishPaperDto, SubmitAnswerDto } from './dto/submit-answers.dto';
+import { ParseObjectIdPipe } from 'src/common/utils/validation/parseObjectIDPipe';
 
 // TODO:: shift api/v1 to global routes.. (in all occurences)
 @Controller('api/v1/answers')

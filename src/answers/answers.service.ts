@@ -4,7 +4,8 @@ import { FinishPaperDto, SubmitAnswerDto } from './dto/submit-answers.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { AnsweredPaper } from './schemas/answered-papers.schema';
 import { Attempt } from './schemas/attempts.schema';
-import { Answer } from 'src/questions/schemas/answer.schema';
+import { AnsweredInterface, AnsweredPaperInterface, AttemptInterface } from './interfaces/answered-papers.interface';
+import { Answered } from './schemas/answered.schema';
 
 
 // TODO:: Work on proper exception handlings!
@@ -24,7 +25,7 @@ export class AnswersService {
             const paper = await this.answerPaperModel.findOne(filter);
 
             // TODO:: When there are more than one attempt available
-            if(paper && paper.attempts.length === 0) {
+            if(paper && paper.attempts.length != 0) {
                 const attempt : Attempt = paper.attempts[0];
 
                 if(finishPaperDto.paperId != attempt.paperId) {
@@ -57,8 +58,11 @@ export class AnswersService {
             const filter = { userId : submitAnswerDto.userId };
 
             let paper = await this.answerPaperModel.findOne(filter);
-            
-            const newAttempt : Attempt =  {
+
+            const attempts : AttemptInterface[] = [];
+            const answered : AnsweredInterface[] = [];
+
+            const newAttempt : AttemptInterface = {
                 attemptId: Date.now().toString(),
                 remainingTime: "100",
                 hasFinished: false,
@@ -67,18 +71,22 @@ export class AnswersService {
                 paperId: submitAnswerDto.paperId,
 
                 finishedAt: undefined,
-                answers: [],
+                answers: answered,
             }
+
+            attempts.push(newAttempt);
             // TODO:: Has to work on the remaining time!!
             
 
+
             if(!paper) {
 
-                const payload = {
+                const answeredPaper : AnsweredPaperInterface = {
                     userId: submitAnswerDto.userId,
-                    attempts: [newAttempt]
+                    attempts: attempts
                 }
-                paper = await this.answerPaperModel.create(payload)
+
+                paper = await this.answerPaperModel.create(answeredPaper)
             }
 
             //TODO:: Update the logic to deal with multiple attempts...
@@ -96,9 +104,9 @@ export class AnswersService {
                 throw new HttpException('PaperId Mismatch', HttpStatus.BAD_REQUEST);
             }
 
-            const answers : Set<Answer> = new Set(currentAttempt.answers);
+            const answers : Set<Answered> = new Set(currentAttempt.answers);
 
-            const newAnswer : Answer = {
+            const newAnswer : Answered = {
                 number: Number(submitAnswerDto.questionIndex),
                 answer: submitAnswerDto.answer,
                 answeredAt: submitAnswerDto.submittedAt
@@ -156,4 +164,20 @@ export class AnswersService {
     // getAnswer(userId: string, paperId: string, questionNo: string) {
     //     throw new Error('Method not implemented.');
     // }
+
+
+    async getFinishedStatus(paperId: string, userId: string) {
+        const paper : AnsweredPaper = await this.answerPaperModel.findOne({ userId, 'attempts.paperId': paperId });
+        
+        if(paper) {
+            if(paper.attempts[0].hasFinished) {
+                return true;
+            }else {
+                return false;
+            }
+
+        }else {
+            throw new HttpException('Paper Not found', HttpStatus.BAD_REQUEST);
+        }
+    }
 }

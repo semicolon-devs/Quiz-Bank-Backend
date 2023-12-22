@@ -11,33 +11,43 @@ import { FinishPaperDto, SubmitAnswerDto } from './dto/submit-answers.dto';
 export class AnswersController {
     constructor(private readonly answersService : AnswersService) {}
 
-    // TODO:: To be completed!!
-    @UseGuards(JwtAuthGuard)
-    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+    // @UseGuards(JwtAuthGuard)
+    // @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
     @Get('status/:userId/:paperId/')
     async getQuestionAnsweredStatus(
         @Param('userId') userId : string,
-        @Param('paperId', ParseObjectIdPipe) paperId: string
+        @Param('paperId') paperId: string
         
     ) {
         return this.answersService.getAnsweredStatus(paperId, userId);
     }
 
     // TODO:: UserId's should be gained from jwt, rather than request body
-    @UseGuards(JwtAuthGuard)
-    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
-    @Post('answers/submit/')
+    // @UseGuards(JwtAuthGuard)
+    // @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+    @Post('submit/')
     async submitQuestion(@Body() submitAnswerDto : SubmitAnswerDto) {
         return await this.answersService.submitAnswer(submitAnswerDto);
     }
 
-    @UseGuards(JwtAuthGuard)
-    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
-    @Post('answers/finish/')
-    finishPaper(@Body() finishPaperDto : FinishPaperDto) {
-        return this.answersService.finishPaper(finishPaperDto);
+    // @UseGuards(JwtAuthGuard)
+    // @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+    @Post('finish/')
+    async finishPaper(@Body() finishPaperDto : FinishPaperDto) {
+        return await this.answersService.finishPaper(finishPaperDto);
     }
     
+    // @UseGuards(JwtAuthGuard)
+    // @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+    @Get('has-finished/:userId/:paperId/')
+    async getPaperFinishedStatus(
+        @Param('userId') userId : string,
+        @Param('paperId') paperId: string
+        
+    ) {
+        return await this.answersService.getFinishedStatus(paperId, userId);
+    }
+
     // @UseGuards(JwtAuthGuard)
     // @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
     // @Get('answers/:userId/:paper_id/:question_index')

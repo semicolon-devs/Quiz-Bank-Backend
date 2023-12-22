@@ -9,7 +9,7 @@ export class AnsweredPaper {
     @Prop({type: String, required: true})
     userId: string;
 
-    @Prop({type: Attempt}) // required??
+    @Prop([{type: Attempt}]) // required??
     attempts: Attempt[];
 
 }

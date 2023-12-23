@@ -33,7 +33,7 @@ export class AnswersController {
     // @UseGuards(JwtAuthGuard)
     // @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
     @Post('finish/')
-    async finishPaper(@Body() finishPaperDto : FinishPaperDto) {
+    finishPaper(@Body() finishPaperDto : FinishPaperDto) {
         return await this.answersService.finishPaper(finishPaperDto);
     }
     
@@ -48,15 +48,14 @@ export class AnswersController {
         return await this.answersService.getFinishedStatus(paperId, userId);
     }
 
-    // @UseGuards(JwtAuthGuard)
-    // @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
-    // @Get('answers/:userId/:paper_id/:question_index')
-    // async getAnswer(
-    //     @Param('userId') userId : string,
-    //     @Param('paper_id') paperId: string,
-    //     @Param('questionNo') questionNo: string
-    // ) {
-    //     return this.answersService.getAnswer(userId, paperId, questionNo);
+    @UseGuards(JwtAuthGuard)
+    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+    @Get('marks/:userId/:paper_id/')
+    async getMarks(
+        @Param('userId') userId : string,
+        @Param('paper_id') paperId: string,
+    ) {
+        return await this.answersService.getMarks(userId, paperId);
 
-    // }
+    }
 }

@@ -21,5 +21,12 @@ export interface AnsweredInterface {
     number: number;
     answer: string;
     answeredAt?: Date;
+    id?: string;
 }
 
+export interface AnswersInterface {
+    index: number;
+    answer?: string;
+    correctAnswer?: string;
+    isCorrect: boolean;
+}

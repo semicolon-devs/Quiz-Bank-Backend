@@ -51,7 +51,7 @@ export class PapersService {
     return this.paperModel.find({});
   }
 
-  findOne(id: ObjectId) {
+  findOne(id: ObjectId | string) {
     return this.paperModel.findById(id);
   }
 
@@ -71,7 +71,7 @@ export class PapersService {
     }
   }
 
-  async findAnswer(paperId: ObjectId, question_index: number) {
+  async findAnswer(paperId: ObjectId | string, question_index: number) {
     try {
       const questions = await this.paperModel
         .findById(paperId)
@@ -105,5 +105,10 @@ export class PapersService {
       .catch((err) => {
         throw err;
       });
+  }
+
+  async getNumberOfQuestions(paperId: string) {
+    const paper : Paper = await this.findOne(paperId);
+    return paper.questions.length;
   }
 }

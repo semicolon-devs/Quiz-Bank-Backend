@@ -4,15 +4,21 @@ import { FinishPaperDto, SubmitAnswerDto } from './dto/submit-answers.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { AnsweredPaper } from './schemas/answered-papers.schema';
 import { Attempt } from './schemas/attempts.schema';
-import { AnsweredInterface, AnsweredPaperInterface, AttemptInterface } from './interfaces/answered-papers.interface';
+import { AnsweredInterface, AnsweredPaperInterface, AnswersInterface, AttemptInterface } from './interfaces/answered-papers.interface';
 import { Answered } from './schemas/answered.schema';
+import { Paper } from 'src/papers/schemas/paper.schema';
+import { Question } from 'src/questions/schemas/question.schema';
+import { PapersService } from 'src/papers/papers.service';
 
 
 // TODO:: Work on proper exception handlings!
 @Injectable()
 export class AnswersService {
     constructor(
-        @InjectModel(AnsweredPaper.name) private readonly answerPaperModel : Model<AnsweredPaper>
+        @InjectModel(AnsweredPaper.name) private readonly answerPaperModel : Model<AnsweredPaper>,
+        @InjectModel(Paper.name) private readonly paperModel : Model<Paper>,
+        @InjectModel(Question.name) private readonly questionModel : Model<Question>,
+        private readonly paperService: PapersService
     ) {}
 
     async finishPaper(finishPaperDto: FinishPaperDto) {
@@ -140,9 +146,9 @@ export class AnswersService {
 
     async getAnsweredStatus(paperId: string, userId: string) {
         const paper : AnsweredPaper = await this.answerPaperModel.findOne({ userId, 'attempts.paperId': paperId });
+        const answeredQuestions: number[] = [];
         
         if(paper) {
-            const answeredQuestions: number[] = [];
 
             paper.attempts.forEach((attempt) => {
                 if (attempt.paperId === paperId) {
@@ -152,19 +158,24 @@ export class AnswersService {
                 }
             });
 
-            return answeredQuestions;
+            const totalQuesstions = await this.paperService.getNumberOfQuestions(paperId);
+
+            return {
+                answered : answeredQuestions,
+                totalQuesstions: totalQuesstions
+            };
 
         }else {
-            throw new HttpException('Paper Not found', HttpStatus.BAD_REQUEST);
+            return {
+                answered : answeredQuestions,
+                totalQuesstions: -1,
+                error : "Paper Not Found"
+            };
+
         }
 
 
     }
-
-    // getAnswer(userId: string, paperId: string, questionNo: string) {
-    //     throw new Error('Method not implemented.');
-    // }
-
 
     async getFinishedStatus(paperId: string, userId: string) {
         const paper : AnsweredPaper = await this.answerPaperModel.findOne({ userId, 'attempts.paperId': paperId });
@@ -180,4 +191,69 @@ export class AnswersService {
             throw new HttpException('Paper Not found', HttpStatus.BAD_REQUEST);
         }
     }
+
+    async getMarks(userId: string, paperId: string) {
+        const answeredPaper : AnsweredPaper = await this.answerPaperModel.findOne({ userId, 'attempts.paperId': paperId });
+
+        if(answeredPaper) {
+            const answeredQuestionsArray : AnsweredInterface[] = answeredPaper.attempts[0].answers || [];
+            let totalMarks = 0;
+
+            for(const answeredQuestion of answeredQuestionsArray) {
+                const answer = await this.paperService.findAnswer(paperId, answeredQuestion.number);
+
+                if(answer.correctAnswer.includes( Number(answeredQuestion.answer) ) ) {
+                    totalMarks++;
+                }
+            }
+
+            return {totalMarks: totalMarks};
+
+        }else {
+            throw new HttpException('Paper Not found', HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    async getCorrectStatus(userId: string, paperId: string) {
+        const answeredPaper : AnsweredPaper = await this.answerPaperModel.findOne({ userId, 'attempts.paperId': paperId });
+        const answers : AnswersInterface[] = [];
+
+        if(answeredPaper) {
+            const answeredQuestionsArray : AnsweredInterface[] = answeredPaper.attempts[0].answers || [];
+            
+
+            for(const answeredQuestion of answeredQuestionsArray) {
+                const answer = await this.paperService.findAnswer(paperId, answeredQuestion.number);
+
+                const ans: AnswersInterface = {
+                                        index: answeredQuestion.number,
+                                        isCorrect: false
+                                    }
+
+                if(answer.correctAnswer.includes( Number(answeredQuestion.answer) ) ) {
+                    ans.isCorrect = true;
+                }else {
+                    ans.isCorrect = false;
+                }
+
+
+                answers.push(ans);
+            }
+
+            const totalQuesstions = await this.paperService.getNumberOfQuestions(paperId);
+
+            return {
+                answers: answers, 
+                totalQuestions : totalQuesstions 
+            };
+
+        }else {
+            return {
+                answers: answers, 
+                totalQuestions : -1,
+                error : "Paper Not Found!"
+            }
+        }
+    }
+
 }

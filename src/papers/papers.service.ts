@@ -48,6 +48,7 @@ export class PapersService {
     }
   }
 
+  // TODO: change according to requirement
   findAll() {
     return this.paperModel.find({}).populate({
       path: 'questions',
@@ -67,8 +68,30 @@ export class PapersService {
     // return this.paperModel.find({}).populate('questions', 'question module subCategory subject difficulty');
   }
 
+  findAllAdmin() {
+    return this.paperModel.find({}).populate({
+      path: 'questions',
+      select: 'question module subCategory subject type difficulty',
+      populate: [{
+        path: 'module',
+        select: 'name -_id'
+      },{
+        path: 'subject',
+        select: 'name -_id'
+      },{
+        path: 'subCategory',
+        select: 'name -_id'
+      },
+    ]
+    });
+  }
+
   findOne(id: ObjectId) {
     return this.paperModel.findById(id);
+  }
+
+  findOneInfo(id: ObjectId) {
+    return this.paperModel.findById(id).select('name paperId -_id');
   }
 
   async findQuestion(paperId: ObjectId, question_index: number) {

@@ -58,4 +58,15 @@ export class AnswersController {
         return await this.answersService.getMarks(userId, paperId);
 
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+    @Get('answers-status/:userId/:paperId/')
+    async getQuestionAnswersStatus(
+        @Param('userId') userId : string,
+        @Param('paperId') paperId: string
+        
+    ) {
+        return this.answersService.getCorrectStatus(paperId, userId);
+    }
 }

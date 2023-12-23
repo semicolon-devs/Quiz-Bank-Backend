@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Role } from 'src/enums/roles.enum';
-import { ParseObjectIdPipe } from 'src/utils/validation/parseObjectIDPipe';
+// import { ParseObjectIdPipe } from 'src/utils/validation/parseObjectIDPipe';
 import { AnswersService } from './answers.service';
 import { FinishPaperDto, SubmitAnswerDto } from './dto/submit-answers.dto';
 
@@ -11,8 +11,8 @@ import { FinishPaperDto, SubmitAnswerDto } from './dto/submit-answers.dto';
 export class AnswersController {
     constructor(private readonly answersService : AnswersService) {}
 
-    // @UseGuards(JwtAuthGuard)
-    // @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+    @UseGuards(JwtAuthGuard)
+    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
     @Get('status/:userId/:paperId/')
     async getQuestionAnsweredStatus(
         @Param('userId') userId : string,
@@ -23,22 +23,22 @@ export class AnswersController {
     }
 
     // TODO:: UserId's should be gained from jwt, rather than request body
-    // @UseGuards(JwtAuthGuard)
-    // @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+    @UseGuards(JwtAuthGuard)
+    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
     @Post('submit/')
     async submitQuestion(@Body() submitAnswerDto : SubmitAnswerDto) {
         return await this.answersService.submitAnswer(submitAnswerDto);
     }
 
-    // @UseGuards(JwtAuthGuard)
-    // @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+    @UseGuards(JwtAuthGuard)
+    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
     @Post('finish/')
-    finishPaper(@Body() finishPaperDto : FinishPaperDto) {
+    async finishPaper(@Body() finishPaperDto : FinishPaperDto) {
         return await this.answersService.finishPaper(finishPaperDto);
     }
     
-    // @UseGuards(JwtAuthGuard)
-    // @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+    @UseGuards(JwtAuthGuard)
+    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
     @Get('has-finished/:userId/:paperId/')
     async getPaperFinishedStatus(
         @Param('userId') userId : string,

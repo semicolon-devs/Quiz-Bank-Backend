@@ -6,8 +6,6 @@ import { AnsweredPaper } from './schemas/answered-papers.schema';
 import { Attempt } from './schemas/attempts.schema';
 import { AnsweredInterface, AnsweredPaperInterface, AnswersInterface, AttemptInterface } from './interfaces/answered-papers.interface';
 import { Answered } from './schemas/answered.schema';
-import { Paper } from 'src/papers/schemas/paper.schema';
-import { Question } from 'src/questions/schemas/question.schema';
 import { PapersService } from 'src/papers/papers.service';
 
 
@@ -16,8 +14,6 @@ import { PapersService } from 'src/papers/papers.service';
 export class AnswersService {
     constructor(
         @InjectModel(AnsweredPaper.name) private readonly answerPaperModel : Model<AnsweredPaper>,
-        @InjectModel(Paper.name) private readonly paperModel : Model<Paper>,
-        @InjectModel(Question.name) private readonly questionModel : Model<Question>,
         private readonly paperService: PapersService
     ) {}
 

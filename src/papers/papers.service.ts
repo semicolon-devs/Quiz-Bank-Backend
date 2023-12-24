@@ -6,14 +6,12 @@ import { CreatePaperInterface } from './interfaces/createPaper.interface';
 import { CreatePaperDto } from './dto/create-paper.dto';
 import { AddQuestionsDto } from './dto/add-questions.dto';
 import { Question } from 'src/questions/schemas/question.schema';
-import { QuestionsService } from 'src/questions/questions.service';
 
 @Injectable()
 export class PapersService {
   constructor(
     @InjectModel(Paper.name) private readonly paperModel: Model<Paper>,
     @InjectModel(Question.name) private readonly questionModel: Model<Question>,
-    private readonly questionService: QuestionsService,
   ) {}
 
   create(createPaperDto: CreatePaperDto) {

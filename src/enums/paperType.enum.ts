@@ -1,6 +1,5 @@
 export enum PaperType {
-    TIMED = 'TIMING',
-    NOT_TIMED = 'NOT_TIMED',
-    PRACTICE = 'PRACTICE'
+    ONE_ATTEMPT = 'ONE ATTEMPT',
+    MULTIPLE_ATTEMPT = 'MULTIPLE ATTEMPT',
   }
   

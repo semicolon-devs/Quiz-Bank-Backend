@@ -11,13 +11,12 @@ import { ParseObjectIdPipe } from 'src/common/utils/validation/parseObjectIDPipe
 export class AnswersController {
     constructor(private readonly answersService : AnswersService) {}
 
-    // TODO:: To be completed!!
     @UseGuards(JwtAuthGuard)
     @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
     @Get('status/:userId/:paperId/')
     async getQuestionAnsweredStatus(
         @Param('userId') userId : string,
-        @Param('paperId', ParseObjectIdPipe) paperId: string
+        @Param('paperId') paperId: string
         
     ) {
         return this.answersService.getAnsweredStatus(paperId, userId);
@@ -26,27 +25,48 @@ export class AnswersController {
     // TODO:: UserId's should be gained from jwt, rather than request body
     @UseGuards(JwtAuthGuard)
     @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
-    @Post('answers/submit/')
+    @Post('submit/')
     async submitQuestion(@Body() submitAnswerDto : SubmitAnswerDto) {
         return await this.answersService.submitAnswer(submitAnswerDto);
     }
 
     @UseGuards(JwtAuthGuard)
     @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
-    @Post('answers/finish/')
-    finishPaper(@Body() finishPaperDto : FinishPaperDto) {
-        return this.answersService.finishPaper(finishPaperDto);
+    @Post('finish/')
+    async finishPaper(@Body() finishPaperDto : FinishPaperDto) {
+        return await this.answersService.finishPaper(finishPaperDto);
     }
     
-    // @UseGuards(JwtAuthGuard)
-    // @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
-    // @Get('answers/:userId/:paper_id/:question_index')
-    // async getAnswer(
-    //     @Param('userId') userId : string,
-    //     @Param('paper_id') paperId: string,
-    //     @Param('questionNo') questionNo: string
-    // ) {
-    //     return this.answersService.getAnswer(userId, paperId, questionNo);
+    @UseGuards(JwtAuthGuard)
+    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+    @Get('has-finished/:userId/:paperId/')
+    async getPaperFinishedStatus(
+        @Param('userId') userId : string,
+        @Param('paperId') paperId: string
+        
+    ) {
+        return await this.answersService.getFinishedStatus(paperId, userId);
+    }
 
-    // }
+    @UseGuards(JwtAuthGuard)
+    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+    @Get('marks/:userId/:paper_id/')
+    async getMarks(
+        @Param('userId') userId : string,
+        @Param('paper_id') paperId: string,
+    ) {
+        return await this.answersService.getMarks(userId, paperId);
+
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+    @Get('answers-status/:userId/:paperId/')
+    async getQuestionAnswersStatus(
+        @Param('userId') userId : string,
+        @Param('paperId') paperId: string
+        
+    ) {
+        return this.answersService.getCorrectStatus(paperId, userId);
+    }
 }

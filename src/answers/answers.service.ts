@@ -4,14 +4,17 @@ import { FinishPaperDto, SubmitAnswerDto } from './dto/submit-answers.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { AnsweredPaper } from './schemas/answered-papers.schema';
 import { Attempt } from './schemas/attempts.schema';
-import { Answer } from 'src/questions/schemas/answer.schema';
+import { AnsweredInterface, AnsweredPaperInterface, AnswersInterface, AttemptInterface } from './interfaces/answered-papers.interface';
+import { Answered } from './schemas/answered.schema';
+import { PapersService } from 'src/papers/papers.service';
 
 
 // TODO:: Work on proper exception handlings!
 @Injectable()
 export class AnswersService {
     constructor(
-        @InjectModel(AnsweredPaper.name) private readonly answerPaperModel : Model<AnsweredPaper>
+        @InjectModel(AnsweredPaper.name) private readonly answerPaperModel : Model<AnsweredPaper>,
+        private readonly paperService: PapersService
     ) {}
 
     async finishPaper(finishPaperDto: FinishPaperDto) {
@@ -24,7 +27,7 @@ export class AnswersService {
             const paper = await this.answerPaperModel.findOne(filter);
 
             // TODO:: When there are more than one attempt available
-            if(paper && paper.attempts.length === 0) {
+            if(paper && paper.attempts.length != 0) {
                 const attempt : Attempt = paper.attempts[0];
 
                 if(finishPaperDto.paperId != attempt.paperId) {
@@ -57,8 +60,11 @@ export class AnswersService {
             const filter = { userId : submitAnswerDto.userId };
 
             let paper = await this.answerPaperModel.findOne(filter);
-            
-            const newAttempt : Attempt =  {
+
+            const attempts : AttemptInterface[] = [];
+            const answered : AnsweredInterface[] = [];
+
+            const newAttempt : AttemptInterface = {
                 attemptId: Date.now().toString(),
                 remainingTime: "100",
                 hasFinished: false,
@@ -67,18 +73,22 @@ export class AnswersService {
                 paperId: submitAnswerDto.paperId,
 
                 finishedAt: undefined,
-                answers: [],
+                answers: answered,
             }
+
+            attempts.push(newAttempt);
             // TODO:: Has to work on the remaining time!!
             
 
+
             if(!paper) {
 
-                const payload = {
+                const answeredPaper : AnsweredPaperInterface = {
                     userId: submitAnswerDto.userId,
-                    attempts: [newAttempt]
+                    attempts: attempts
                 }
-                paper = await this.answerPaperModel.create(payload)
+
+                paper = await this.answerPaperModel.create(answeredPaper)
             }
 
             //TODO:: Update the logic to deal with multiple attempts...
@@ -96,9 +106,9 @@ export class AnswersService {
                 throw new HttpException('PaperId Mismatch', HttpStatus.BAD_REQUEST);
             }
 
-            const answers : Set<Answer> = new Set(currentAttempt.answers);
+            const answers : Set<Answered> = new Set(currentAttempt.answers);
 
-            const newAnswer : Answer = {
+            const newAnswer : Answered = {
                 number: Number(submitAnswerDto.questionIndex),
                 answer: submitAnswerDto.answer,
                 answeredAt: submitAnswerDto.submittedAt
@@ -132,9 +142,9 @@ export class AnswersService {
 
     async getAnsweredStatus(paperId: string, userId: string) {
         const paper : AnsweredPaper = await this.answerPaperModel.findOne({ userId, 'attempts.paperId': paperId });
+        const answeredQuestions: number[] = [];
         
         if(paper) {
-            const answeredQuestions: number[] = [];
 
             paper.attempts.forEach((attempt) => {
                 if (attempt.paperId === paperId) {
@@ -144,16 +154,102 @@ export class AnswersService {
                 }
             });
 
-            return answeredQuestions;
+            const totalQuesstions = await this.paperService.getNumberOfQuestions(paperId);
+
+            return {
+                answered : answeredQuestions,
+                totalQuesstions: totalQuesstions
+            };
 
         }else {
-            throw new HttpException('Paper Not found', HttpStatus.BAD_REQUEST);
+            return {
+                answered : answeredQuestions,
+                totalQuesstions: -1,
+                error : "Paper Not Found"
+            };
+
         }
 
 
     }
 
-    // getAnswer(userId: string, paperId: string, questionNo: string) {
-    //     throw new Error('Method not implemented.');
-    // }
+    async getFinishedStatus(paperId: string, userId: string) {
+        const paper : AnsweredPaper = await this.answerPaperModel.findOne({ userId, 'attempts.paperId': paperId });
+        
+        if(paper) {
+            if(paper.attempts[0].hasFinished) {
+                return true;
+            }else {
+                return false;
+            }
+
+        }else {
+            throw new HttpException('Paper Not found', HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    async getMarks(userId: string, paperId: string) {
+        const answeredPaper : AnsweredPaper = await this.answerPaperModel.findOne({ userId, 'attempts.paperId': paperId });
+
+        if(answeredPaper) {
+            const answeredQuestionsArray : AnsweredInterface[] = answeredPaper.attempts[0].answers || [];
+            let totalMarks = 0;
+
+            for(const answeredQuestion of answeredQuestionsArray) {
+                const answer = await this.paperService.findAnswer(paperId, answeredQuestion.number);
+
+                if(answer.correctAnswer.includes( Number(answeredQuestion.answer) ) ) {
+                    totalMarks++;
+                }
+            }
+
+            return {totalMarks: totalMarks};
+
+        }else {
+            throw new HttpException('Paper Not found', HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    async getCorrectStatus(userId: string, paperId: string) {
+        const answeredPaper : AnsweredPaper = await this.answerPaperModel.findOne({ userId, 'attempts.paperId': paperId });
+        const answers : AnswersInterface[] = [];
+
+        if(answeredPaper) {
+            const answeredQuestionsArray : AnsweredInterface[] = answeredPaper.attempts[0].answers || [];
+            
+
+            for(const answeredQuestion of answeredQuestionsArray) {
+                const answer = await this.paperService.findAnswer(paperId, answeredQuestion.number);
+
+                const ans: AnswersInterface = {
+                                        index: answeredQuestion.number,
+                                        isCorrect: false
+                                    }
+
+                if(answer.correctAnswer.includes( Number(answeredQuestion.answer) ) ) {
+                    ans.isCorrect = true;
+                }else {
+                    ans.isCorrect = false;
+                }
+
+
+                answers.push(ans);
+            }
+
+            const totalQuesstions = await this.paperService.getNumberOfQuestions(paperId);
+
+            return {
+                answers: answers, 
+                totalQuestions : totalQuesstions 
+            };
+
+        }else {
+            return {
+                answers: answers, 
+                totalQuestions : -1,
+                error : "Paper Not Found!"
+            }
+        }
+    }
+
 }

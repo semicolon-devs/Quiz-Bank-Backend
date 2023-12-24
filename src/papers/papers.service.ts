@@ -6,7 +6,6 @@ import { PaperInterface } from './interfaces/createPaper.interface';
 import { CreatePaperDto } from './dto/create-paper.dto';
 import { AddQuestionsDto } from './dto/add-questions.dto';
 import { Question } from 'src/questions/schemas/question.schema';
-import { QuestionsService } from 'src/questions/questions.service';
 import { UpdatePaper } from './dto/update-paper.dto';
 
 @Injectable()
@@ -14,7 +13,6 @@ export class PapersService {
   constructor(
     @InjectModel(Paper.name) private readonly paperModel: Model<Paper>,
     @InjectModel(Question.name) private readonly questionModel: Model<Question>,
-    private readonly questionService: QuestionsService,
   ) {}
 
   create(createPaperDto: CreatePaperDto) {
@@ -67,7 +65,7 @@ export class PapersService {
     // return this.paperModel.find({}).populate('questions', 'question module subCategory subject difficulty');
   }
 
-  findOne(id: ObjectId) {
+  findOne(id: ObjectId | string) {
     return this.paperModel.findById(id);
   }
 
@@ -87,7 +85,7 @@ export class PapersService {
     }
   }
 
-  async findAnswer(paperId: ObjectId, question_index: number) {
+  async findAnswer(paperId: ObjectId | string, question_index: number) {
     try {
       const questions = await this.paperModel
         .findById(paperId)
@@ -127,5 +125,10 @@ export class PapersService {
 
   updatePaper(paperId: Schema.Types.ObjectId, payload: UpdatePaper) {
     return this.paperModel.findByIdAndUpdate(paperId, payload);
+  }
+
+  async getNumberOfQuestions(paperId: string) {
+    const paper : Paper = await this.findOne(paperId);
+    return paper.questions.length;
   }
 }

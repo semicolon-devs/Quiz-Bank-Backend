@@ -175,4 +175,9 @@ export class PapersService {
   updatePaper(paperId: Schema.Types.ObjectId, payload: UpdatePaper) {
     return this.paperModel.findByIdAndUpdate(paperId, payload);
   }
+
+  async getNumberOfQuestions(paperId: string) {
+    const paper : Paper = await this.findOne(paperId);
+    return paper.questions.length;
+  }
 }

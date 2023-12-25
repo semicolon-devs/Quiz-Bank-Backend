@@ -53,41 +53,67 @@ export class PapersService {
     return this.paperModel.find({}).populate({
       path: 'questions',
       select: 'question module subCategory subject type difficulty',
-      populate: [{
-        path: 'module',
-        select: 'name -_id'
-      },{
-        path: 'subject',
-        select: 'name -_id'
-      },{
-        path: 'subCategory',
-        select: 'name -_id'
-      },
-    ]
+      populate: [
+        {
+          path: 'module',
+          select: 'name -_id',
+        },
+        {
+          path: 'subject',
+          select: 'name -_id',
+        },
+        {
+          path: 'subCategory',
+          select: 'name -_id',
+        },
+      ],
     });
-    // return this.paperModel.find({}).populate('questions', 'question module subCategory subject difficulty');
   }
 
   findAllAdmin() {
     return this.paperModel.find({}).populate({
       path: 'questions',
       select: 'question module subCategory subject type difficulty',
-      populate: [{
-        path: 'module',
-        select: 'name -_id'
-      },{
-        path: 'subject',
-        select: 'name -_id'
-      },{
-        path: 'subCategory',
-        select: 'name -_id'
-      },
-    ]
+      populate: [
+        {
+          path: 'module',
+          select: 'name -_id',
+        },
+        {
+          path: 'subject',
+          select: 'name -_id',
+        },
+        {
+          path: 'subCategory',
+          select: 'name -_id',
+        },
+      ],
+    });
+  }
+
+  findOneAdmin(id: ObjectId) {
+    return this.paperModel.findById(id).populate({
+      path: 'questions',
+      select: 'question module subCategory subject type difficulty',
+      populate: [
+        {
+          path: 'module',
+          select: 'name -_id',
+        },
+        {
+          path: 'subject',
+          select: 'name -_id',
+        },
+        {
+          path: 'subCategory',
+          select: 'name -_id',
+        },
+      ],
     });
   }
 
   findOne(id: ObjectId) {
-    return this.paperModel.findById(id);
+    return this.paperModel.findById(id).select('-questions');
   }
 
   findOneInfo(id: ObjectId) {

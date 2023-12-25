@@ -56,6 +56,13 @@ export class PapersController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN, Role.MODERATOR)
+  @Get('admin/:id')
+  findOneAdmin(@Param('id', ParseObjectIdPipe) id: ObjectId) {
+    return this.papersService.findOneAdmin(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
   @Get(':id')
   findOne(@Param('id', ParseObjectIdPipe) id: ObjectId) {

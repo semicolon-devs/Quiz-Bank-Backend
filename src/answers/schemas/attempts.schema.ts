@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
-import { Answer } from "src/questions/schemas/answer.schema";
+import { Answered } from "./answered.schema";
 
 export type AttemptsDocument = HydratedDocument<Attempt>;
 
@@ -24,14 +24,15 @@ export class Attempt {
     @Prop({type: String, required: true})
     remainingTime: string;
 
-    @Prop({type: Answer }) // required?
-    answers: Answer[];
+    @Prop([{type: Answered }]) // Change...?
+    answers?: Answered[];
 
     @Prop()
     createdAt?: Date;
 
     @Prop()
     updatedAt?: Date;
+
 }
 
 

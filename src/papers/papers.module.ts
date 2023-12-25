@@ -7,7 +7,6 @@ import {
   Question,
   QuestionSchema,
 } from 'src/questions/schemas/question.schema';
-import { QuestionsService } from 'src/questions/questions.service';
 
 @Module({
   imports: [
@@ -19,7 +18,7 @@ import { QuestionsService } from 'src/questions/questions.service';
       },
     ]),
   ],
-  providers: [PapersService, QuestionsService],
+  providers: [PapersService],
   controllers: [PapersController],
 })
 export class PapersModule {}

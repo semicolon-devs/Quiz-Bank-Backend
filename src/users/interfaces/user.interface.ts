@@ -6,4 +6,9 @@ export interface UserInterface {
   email: string;
   password?: string;
   roles: Role[];
+  otp?: {
+    key: string;
+    expireAt: Date;
+  };
 }
+

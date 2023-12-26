@@ -143,6 +143,18 @@ export class AnswersService {
     async getAnsweredStatus(paperId: string, userId: string) {
         const paper : AnsweredPaper = await this.answerPaperModel.findOne({ userId, 'attempts.paperId': paperId });
         const answeredQuestions: number[] = [];
+
+        let totalQuesstions;
+        
+        try{
+            totalQuesstions = await this.paperService.getNumberOfQuestions(paperId);
+        }catch (err) {
+            return {
+                answered : answeredQuestions,
+                totalQuesstions: -1,
+                error : "Paper Not Found"
+            };
+        }
         
         if(paper) {
 
@@ -154,7 +166,6 @@ export class AnswersService {
                 }
             });
 
-            const totalQuesstions = await this.paperService.getNumberOfQuestions(paperId);
 
             return {
                 answered : answeredQuestions,
@@ -164,8 +175,7 @@ export class AnswersService {
         }else {
             return {
                 answered : answeredQuestions,
-                totalQuesstions: -1,
-                error : "Paper Not Found"
+                totalQuesstions: totalQuesstions,
             };
 
         }

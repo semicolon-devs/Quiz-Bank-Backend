@@ -177,7 +177,7 @@ export class PapersService {
   }
 
   async getNumberOfQuestions(paperId: string) {
-    const paper : Paper = await this.findOne(paperId);
+    const paper : Paper = await this.paperModel.findById(paperId);
     return paper.questions.length;
   }
 }

@@ -6,7 +6,6 @@ import { PaperInterface } from './interfaces/createPaper.interface';
 import { CreatePaperDto } from './dto/create-paper.dto';
 import { AddQuestionsDto } from './dto/add-questions.dto';
 import { Question } from 'src/questions/schemas/question.schema';
-import { QuestionsService } from 'src/questions/questions.service';
 import { UpdatePaper } from './dto/update-paper.dto';
 
 @Injectable()
@@ -14,7 +13,6 @@ export class PapersService {
   constructor(
     @InjectModel(Paper.name) private readonly paperModel: Model<Paper>,
     @InjectModel(Question.name) private readonly questionModel: Model<Question>,
-    private readonly questionService: QuestionsService,
   ) {}
 
   create(createPaperDto: CreatePaperDto) {
@@ -53,41 +51,67 @@ export class PapersService {
     return this.paperModel.find({}).populate({
       path: 'questions',
       select: 'question module subCategory subject type difficulty',
-      populate: [{
-        path: 'module',
-        select: 'name -_id'
-      },{
-        path: 'subject',
-        select: 'name -_id'
-      },{
-        path: 'subCategory',
-        select: 'name -_id'
-      },
-    ]
+      populate: [
+        {
+          path: 'module',
+          select: 'name -_id',
+        },
+        {
+          path: 'subject',
+          select: 'name -_id',
+        },
+        {
+          path: 'subCategory',
+          select: 'name -_id',
+        },
+      ],
     });
-    // return this.paperModel.find({}).populate('questions', 'question module subCategory subject difficulty');
   }
 
   findAllAdmin() {
     return this.paperModel.find({}).populate({
       path: 'questions',
       select: 'question module subCategory subject type difficulty',
-      populate: [{
-        path: 'module',
-        select: 'name -_id'
-      },{
-        path: 'subject',
-        select: 'name -_id'
-      },{
-        path: 'subCategory',
-        select: 'name -_id'
-      },
-    ]
+      populate: [
+        {
+          path: 'module',
+          select: 'name -_id',
+        },
+        {
+          path: 'subject',
+          select: 'name -_id',
+        },
+        {
+          path: 'subCategory',
+          select: 'name -_id',
+        },
+      ],
+    });
+  }
+
+  findOneAdmin(id: ObjectId) {
+    return this.paperModel.findById(id).populate({
+      path: 'questions',
+      select: 'question module subCategory subject type difficulty',
+      populate: [
+        {
+          path: 'module',
+          select: 'name -_id',
+        },
+        {
+          path: 'subject',
+          select: 'name -_id',
+        },
+        {
+          path: 'subCategory',
+          select: 'name -_id',
+        },
+      ],
     });
   }
 
   findOne(id: ObjectId | string) {
-    return this.paperModel.findById(id);
+    return this.paperModel.findById(id).select('-questions');
   }
 
   findOneInfo(id: ObjectId) {

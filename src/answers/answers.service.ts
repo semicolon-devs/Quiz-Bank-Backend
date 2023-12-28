@@ -144,10 +144,10 @@ export class AnswersService {
         const paper : AnsweredPaper = await this.answerPaperModel.findOne({ userId, 'attempts.paperId': paperId });
         const answeredQuestions: number[] = [];
 
-        let totalQuesstions;
+        let totalQuestions;
         
         try{
-            totalQuesstions = await this.paperService.getNumberOfQuestions(paperId);
+            totalQuestions = await this.paperService.getNumberOfQuestions(paperId);
         }catch (err) {
             return {
                 answered : answeredQuestions,
@@ -169,13 +169,13 @@ export class AnswersService {
 
             return {
                 answered : answeredQuestions,
-                totalQuesstions: totalQuesstions
+                totalQuestions: totalQuestions
             };
 
         }else {
             return {
                 answered : answeredQuestions,
-                totalQuesstions: totalQuesstions,
+                totalQuestions: totalQuestions,
             };
 
         }

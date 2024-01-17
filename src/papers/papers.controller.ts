@@ -39,6 +39,7 @@ export class PapersController {
     return this.papersService.addQuestion(paper_id, addQuestionsDto);
   }
 
+  // to get list available papers to users
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
   @Get()
@@ -46,11 +47,34 @@ export class PapersController {
     return this.papersService.findAll();
   }
 
+  // to list already questions in add question page
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN)
+  @Get('/admin')
+  findAllAdmin() {
+    return this.papersService.findAllAdmin();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN, Role.MODERATOR)
+  @Get('admin/:id')
+  findOneAdmin(@Param('id', ParseObjectIdPipe) id: ObjectId) {
+    return this.papersService.findOneAdmin(id);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
   @Get(':id')
   findOne(@Param('id', ParseObjectIdPipe) id: ObjectId) {
     return this.papersService.findOne(id);
+  }
+
+  // to get paper name and code
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+  @Get(':id/info')
+  findPaperInfo(@Param('id', ParseObjectIdPipe) id: ObjectId) {
+    return this.papersService.findOneInfo(id);
   }
 
   @UseGuards(JwtAuthGuard)

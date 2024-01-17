@@ -123,10 +123,7 @@ export class SubjectsService {
     });
   }
 
-  async updateModule(
-    id: ObjectId,
-    updateModuleDto: UpdateModuleDto,
-  ) {
+  async updateModule(id: ObjectId, updateModuleDto: UpdateModuleDto) {
     const module: ModuleInterface = {
       name: updateModuleDto.name,
     };
@@ -136,6 +133,8 @@ export class SubjectsService {
     });
   }
 
+  // TODO: change these objects id to actual ids in production database
+  // when removing one subject all questions from that subject assingng to the default subject
   remove(id: ObjectId) {
     this.questionModel.updateMany(
       { subject: id },
@@ -149,6 +148,8 @@ export class SubjectsService {
     return this.subjectModel.findByIdAndDelete(id);
   }
 
+  // TODO: change these objects id to actual ids in production database
+  // when removing one subcategory all questions from that subcategory assingng to the default subCategory
   removeSubCategory(id: ObjectId, course_id: ObjectId) {
     this.questionModel.updateMany(
       { subCategory: course_id },
@@ -163,10 +164,12 @@ export class SubjectsService {
     );
   }
 
+  // TODO: change these objects id to actual ids in production database
+  // when removing one module all questions from that module assingng to the default module
   removeModule(id: ObjectId, module_id: ObjectId) {
     this.questionModel.updateMany(
       { module: module_id },
-      { module: '' }, // id of the subject category named other
+      { module: '6557a4aabe2e7d4365a1ec8a' }, // id of the subject category named other
       { new: true },
     );
 

@@ -7,12 +7,15 @@ import { CreatePaperDto } from './dto/create-paper.dto';
 import { AddQuestionsDto } from './dto/add-questions.dto';
 import { Question } from 'src/questions/schemas/question.schema';
 import { UpdatePaper } from './dto/update-paper.dto';
+import { AnswersService } from 'src/answers/answers.service';
+import { GetAnswerRequestDto } from 'src/answers/dto/submit-answers.dto';
 
 @Injectable()
 export class PapersService {
   constructor(
     @InjectModel(Paper.name) private readonly paperModel: Model<Paper>,
     @InjectModel(Question.name) private readonly questionModel: Model<Question>,
+    private readonly answersService : AnswersService
   ) {}
 
   create(createPaperDto: CreatePaperDto) {
@@ -30,7 +33,7 @@ export class PapersService {
   async addQuestion(paper_id: ObjectId, reqDto: AddQuestionsDto) {
     try {
       const result = await this.paperModel.findById(paper_id);
-      let questionIds: Set<string> = new Set(result.questions);
+      const questionIds: Set<string> = new Set(result.questions);
 
       reqDto.questionIdArray.forEach((id) => {
         questionIds.add(id);
@@ -118,17 +121,29 @@ export class PapersService {
     return this.paperModel.findById(id).select('name paperId -_id');
   }
 
-  async findQuestion(paperId: ObjectId, question_index: number) {
+  async findQuestion(paperId: ObjectId | string, question_index: number, userId: string) {
     try {
       const questions = await this.paperModel
         .findById(paperId)
         .select('questions -_id');
       const questionIds: Array<string> = Array.from(questions.questions);
-      return this.questionModel
+      const question = await this.questionModel
         .findById(questionIds.at(question_index - 1))
         .select(
           '-subject -subCategory -module -difficulty -correctAnswer -explaination -_id',
         );
+
+        const getAnswerRequestDto : GetAnswerRequestDto  = {paperId : paperId, questionIndex: question_index, userId: userId }
+        let answer = null;
+
+        try {
+          answer = await this.answersService.getAnswer(getAnswerRequestDto);
+        } catch(err){
+          
+        }
+
+        return {...question, answer: answer};
+
     } catch (err) {
       throw err;
     }

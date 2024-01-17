@@ -17,6 +17,7 @@ import { Roles } from 'src/auth/decorator/roles.decorator';
 import { Role } from 'src/enums/roles.enum';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UpdatePaper } from './dto/update-paper.dto';
+import { getCurrentUserId } from 'src/auth/decorator/user-id.decorator';
 
 @Controller('api/v1/papers')
 export class PapersController {
@@ -83,8 +84,9 @@ export class PapersController {
   getQuestion(
     @Param('paper_id', ParseObjectIdPipe) paperId: ObjectId,
     @Param('question_index') question_index: number,
+    @getCurrentUserId() userId : string
   ) {
-    return this.papersService.findQuestion(paperId, question_index);
+    return this.papersService.findQuestion(paperId, question_index, userId);
   }
 
   @UseGuards(JwtAuthGuard)

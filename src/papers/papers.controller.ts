@@ -84,9 +84,8 @@ export class PapersController {
   getQuestion(
     @Param('paper_id', ParseObjectIdPipe) paperId: ObjectId,
     @Param('question_index') question_index: number,
-    @getCurrentUserId() userId : string,
+    @getCurrentUserId() userId : string
   ) {
-
     return this.papersService.findQuestion(paperId, question_index, userId);
   }
 

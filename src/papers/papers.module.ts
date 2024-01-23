@@ -7,15 +7,15 @@ import {
   Question,
   QuestionSchema,
 } from 'src/questions/schemas/question.schema';
+import { AnsweredPaper, AnsweredPaperSchema } from 'src/answers/schemas/answered-papers.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Paper.name, schema: PaperSchema },
-      {
-        name: Question.name,
-        schema: QuestionSchema,
-      },
+      { name: Question.name, schema: QuestionSchema },
+      { name: AnsweredPaper.name, schema: AnsweredPaperSchema},
+
     ]),
   ],
   providers: [PapersService],

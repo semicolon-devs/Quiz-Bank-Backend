@@ -7,12 +7,15 @@ import { CreatePaperDto } from './dto/create-paper.dto';
 import { AddQuestionsDto } from './dto/add-questions.dto';
 import { Question } from 'src/questions/schemas/question.schema';
 import { UpdatePaper } from './dto/update-paper.dto';
+import { AnsweredPaper } from 'src/answers/schemas/answered-papers.schema';
+import { GetAnswerRequestDto } from 'src/answers/dto/submit-answers.dto';
 
 @Injectable()
 export class PapersService {
   constructor(
     @InjectModel(Paper.name) private readonly paperModel: Model<Paper>,
     @InjectModel(Question.name) private readonly questionModel: Model<Question>,
+    @InjectModel(AnsweredPaper.name) private readonly answerPaperModel : Model<AnsweredPaper>,
   ) {}
 
   create(createPaperDto: CreatePaperDto) {
@@ -118,17 +121,52 @@ export class PapersService {
     return this.paperModel.findById(id).select('name paperId -_id');
   }
 
-  async findQuestion(paperId: ObjectId, question_index: number) {
+  // async findQuestion(paperId: ObjectId, question_index: number) {
+  //   try {
+  //     const questions = await this.paperModel
+  //       .findById(paperId)
+  //       .select('questions -_id');
+  //     const questionIds: Array<string> = Array.from(questions.questions);
+  //     return this.questionModel
+  //       .findById(questionIds.at(question_index - 1))
+  //       .select(
+  //         '-subject -subCategory -module -difficulty -correctAnswer -explaination -_id',
+  //       );
+  //   } catch (err) {
+  //     throw err;
+  //   }
+  // }
+
+  async findQuestion(paperId: ObjectId | string, question_index: number, userId: string) {
     try {
       const questions = await this.paperModel
         .findById(paperId)
         .select('questions -_id');
       const questionIds: Array<string> = Array.from(questions.questions);
-      return this.questionModel
+      const question = await this.questionModel
         .findById(questionIds.at(question_index - 1))
         .select(
           '-subject -subCategory -module -difficulty -correctAnswer -explaination -_id',
         );
+
+        const getAnswerRequestDto : GetAnswerRequestDto  = {paperId : paperId, questionIndex: question_index, userId: userId }
+        let answer = null;
+
+        try {
+          const paper : AnsweredPaper = await this.answerPaperModel.findOne({ userId : getAnswerRequestDto.userId , 'attempts.paperId': getAnswerRequestDto.paperId });
+
+          if(paper) {
+              answer = await paper.attempts[0].answers.find((ans) => ans.number === getAnswerRequestDto.questionIndex);
+
+          }
+
+
+      } catch (err) {
+          throw err;
+      }
+
+        return {...question, answer: answer};
+
     } catch (err) {
       throw err;
     }

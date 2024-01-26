@@ -138,9 +138,10 @@ export class PapersService {
 
         try {
           const paper : AnsweredPaper = await this.answerPaperModel.findOne({ userId : getAnswerRequestDto.userId , 'attempts.paperId': getAnswerRequestDto.paperId });
-
+          console.log();
+          
           if(paper) {
-              answer = await paper.attempts[0].answers.find((ans) => ans.number === getAnswerRequestDto.questionIndex);
+            answer = paper.attempts[0].answers.find((ans)=> ans.number == getAnswerRequestDto.questionIndex);
 
           }
 
@@ -149,7 +150,7 @@ export class PapersService {
           throw err;
       }
 
-        return {...question, answer: answer};
+        return {question, answer: {number: answer.number, answer: answer.answer}};
 
     } catch (err) {
       throw err;

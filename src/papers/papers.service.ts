@@ -138,7 +138,6 @@ export class PapersService {
 
         try {
           const paper : AnsweredPaper = await this.answerPaperModel.findOne({ userId : getAnswerRequestDto.userId , 'attempts.paperId': getAnswerRequestDto.paperId });
-          console.log();
           
           if(paper) {
             answer = paper.attempts[0].answers.find((ans)=> ans.number == getAnswerRequestDto.questionIndex);

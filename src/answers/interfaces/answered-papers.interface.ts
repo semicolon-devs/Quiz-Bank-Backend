@@ -19,7 +19,7 @@ export interface AttemptInterface {
 
 export interface AnsweredInterface {
     number: number;
-    answer: string;
+    answer: number[];
     answeredAt?: Date;
     id?: string;
 }

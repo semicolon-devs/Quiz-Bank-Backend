@@ -5,7 +5,7 @@ export class SubmitAnswerDto {
     readonly userId : string;
     readonly paperId : string;
     readonly questionIndex : string;
-    readonly answer: string;
+    readonly answer: number[];
     submittedAt : Date;
 }
 

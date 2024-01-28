@@ -15,7 +15,8 @@ export class PapersService {
   constructor(
     @InjectModel(Paper.name) private readonly paperModel: Model<Paper>,
     @InjectModel(Question.name) private readonly questionModel: Model<Question>,
-    @InjectModel(AnsweredPaper.name) private readonly answerPaperModel : Model<AnsweredPaper>,
+    @InjectModel(AnsweredPaper.name)
+    private readonly answerPaperModel: Model<AnsweredPaper>,
   ) {}
 
   create(createPaperDto: CreatePaperDto) {
@@ -121,7 +122,11 @@ export class PapersService {
     return this.paperModel.findById(id).select('name paperId -_id');
   }
 
-  async findQuestion(paperId: ObjectId | string, question_index: number, userId: string) {
+  async findQuestion(
+    paperId: ObjectId | string,
+    question_index: number,
+    userId: string,
+  ) {
     try {
       const questions = await this.paperModel
         .findById(paperId)
@@ -133,24 +138,35 @@ export class PapersService {
           '-subject -subCategory -module -difficulty -correctAnswer -explaination -_id',
         );
 
-        const getAnswerRequestDto : GetAnswerRequestDto  = {paperId : paperId, questionIndex: question_index, userId: userId }
-        let answer = null;
+      const getAnswerRequestDto: GetAnswerRequestDto = {
+        paperId: paperId,
+        questionIndex: question_index,
+        userId: userId,
+      };
+      let answer = null;
 
-        try {
-          const paper : AnsweredPaper = await this.answerPaperModel.findOne({ userId : getAnswerRequestDto.userId , 'attempts.paperId': getAnswerRequestDto.paperId });
-          
-          if(paper) {
-            answer = paper.attempts[0].answers.find((ans)=> ans.number == getAnswerRequestDto.questionIndex);
+      try {
+        const paper: AnsweredPaper = await this.answerPaperModel.findOne({
+          userId: getAnswerRequestDto.userId,
+          'attempts.paperId': getAnswerRequestDto.paperId,
+        });
 
-          }
-
-
+        if (paper) {
+          answer = paper.attempts[0].answers.find(
+            (ans) => ans.number == getAnswerRequestDto.questionIndex,
+          );
+        }
       } catch (err) {
-          throw err;
+        throw err;
       }
+      const returnObj = {
+        question,
+      };
 
-        return {question, answer: {number: answer.number, answer: answer.answer}};
-
+      if (answer != undefined) {
+        returnObj['answer'] = { number: answer.number, answer: answer.answer };
+      }
+      return returnObj;
     } catch (err) {
       throw err;
     }
@@ -199,7 +215,7 @@ export class PapersService {
   }
 
   async getNumberOfQuestions(paperId: string) {
-    const paper : Paper = await this.paperModel.findById(paperId);
+    const paper: Paper = await this.paperModel.findById(paperId);
     return paper.questions.length;
   }
 }

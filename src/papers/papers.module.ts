@@ -6,7 +6,6 @@ import { Paper, PaperSchema } from './schemas/paper.schema';
 import { Question, QuestionSchema } from 'src/questions/schemas/question.schema';
 import { AnswersService } from 'src/answers/answers.service';
 import { AnsweredPaper, AnsweredPaperSchema } from 'src/answers/schemas/answered-papers.schema';
-import { AnswersModule } from 'src/answers/answers.module';
 
 @Module({
   imports: [
@@ -19,5 +18,6 @@ import { AnswersModule } from 'src/answers/answers.module';
   ],
   providers: [PapersService, AnswersService],
   controllers: [PapersController],
+  exports: [PapersService],
 })
 export class PapersModule {}

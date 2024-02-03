@@ -6,6 +6,8 @@ import { AnsweredPaper, AnsweredPaperSchema } from './schemas/answered-papers.sc
 import { PapersService } from 'src/papers/papers.service';
 import { Paper, PaperSchema } from 'src/papers/schemas/paper.schema';
 import { Question, QuestionSchema } from 'src/questions/schemas/question.schema';
+import { Answered, AnsweredQuestionSchema } from './schemas/answered.schema';
+import { PapersModule } from 'src/papers/papers.module';
 
 @Module({
   imports: [
@@ -13,9 +15,12 @@ import { Question, QuestionSchema } from 'src/questions/schemas/question.schema'
       { name: AnsweredPaper.name, schema: AnsweredPaperSchema},
       { name: Paper.name, schema: PaperSchema },
       { name: Question.name, schema: QuestionSchema, },
+      // { name: Answered.name, schema: AnsweredQuestionSchema, },
     ]),
+
+    PapersModule
   ],
   controllers: [AnswersController],
-  providers: [AnswersService, PapersService ]
+  providers: [AnswersService]
 })
 export class AnswersModule {}

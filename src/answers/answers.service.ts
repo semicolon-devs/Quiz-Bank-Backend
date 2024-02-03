@@ -56,6 +56,8 @@ export class AnswersService {
         const answeredAt : Date = new Date();
         submitAnswerDto.submittedAt = answeredAt;
 
+        submitAnswerDto.questionIndex = Number(submitAnswerDto.questionIndex);
+
         try {
             const filter = { userId : submitAnswerDto.userId };
 
@@ -108,6 +110,13 @@ export class AnswersService {
 
             const answers : Set<Answered> = new Set(currentAttempt.answers);
 
+            if(submitAnswerDto.questionIndex && submitAnswerDto.questionIndex <= 100) {
+                answers.forEach((answer) => {
+                    if(answer.number == submitAnswerDto.questionIndex){
+                        answers.delete(answer);
+                    }
+                })
+            }
             const newAnswer : Answered = {
                 number: Number(submitAnswerDto.questionIndex),
                 answer: submitAnswerDto.answer,
@@ -116,7 +125,7 @@ export class AnswersService {
     
             answers.add(newAnswer);
 
-            currentAttempt.answers = Array.from(answers);
+            currentAttempt.answers = Array.from(answers).sort((a, b) => a.number - b.number);
             
             await paper.save();
 

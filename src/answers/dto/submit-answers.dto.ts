@@ -4,8 +4,8 @@ export class SubmitAnswerDto {
     // :userId/:paper_id/:question_index
     readonly userId : string;
     readonly paperId : string;
-    readonly questionIndex : string;
     readonly answer: number[];
+    questionIndex : string | number;
     submittedAt : Date;
 }
 

@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { FinishPaperDto, GetAnswerRequestDto, SubmitAnswerDto } from './dto/submit-answers.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -14,7 +14,7 @@ import { PapersService } from 'src/papers/papers.service';
 export class AnswersService {
     constructor(
         @InjectModel(AnsweredPaper.name) private readonly answerPaperModel : Model<AnsweredPaper>,
-        private readonly paperService: PapersService
+        @Inject(forwardRef(() => PapersService)) private readonly paperService: PapersService
     ) {}
 
     async finishPaper(finishPaperDto: FinishPaperDto) {
@@ -35,7 +35,6 @@ export class AnswersService {
                 }
 
                 attempt.finishedAt = submittedAt;
-                attempt.hasFinished = true;
 
                 await paper.save();
 
@@ -196,9 +195,10 @@ export class AnswersService {
     async getAnswer(getAnswerRequestDto: GetAnswerRequestDto) {
         try {
             const paper : AnsweredPaper = await this.answerPaperModel.findOne({ userId : getAnswerRequestDto.userId , 'attempts.paperId': getAnswerRequestDto.paperId });
-
+      
             if(paper) {
-                return await paper.attempts[0].answers.find((ans) => ans.number === getAnswerRequestDto.questionIndex);
+
+                return paper.attempts[0].answers.find((ans) => ans.number == getAnswerRequestDto.questionIndex);
 
             }
 

@@ -4,7 +4,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Role } from 'src/enums/roles.enum';
 import { AnswersService } from './answers.service';
 import { FinishPaperDto, SubmitAnswerDto } from './dto/submit-answers.dto';
-import { ParseObjectIdPipe } from 'src/common/utils/validation/parseObjectIDPipe';
+// import { ParseObjectIdPipe } from 'src/common/utils/validation/parseObjectIDPipe';
 
 // TODO:: shift api/v1 to global routes.. (in all occurences)
 @Controller('api/v1/answers')
@@ -67,6 +67,6 @@ export class AnswersController {
         @Param('paperId') paperId: string
         
     ) {
-        return this.answersService.getCorrectStatus(paperId, userId);
+        return this.answersService.getCorrectStatus(userId, paperId);
     }
 }

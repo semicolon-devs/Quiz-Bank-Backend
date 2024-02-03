@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { FinishPaperDto, SubmitAnswerDto } from './dto/submit-answers.dto';
+import { FinishPaperDto, GetAnswerRequestDto, SubmitAnswerDto } from './dto/submit-answers.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { AnsweredPaper } from './schemas/answered-papers.schema';
 import { Attempt } from './schemas/attempts.schema';
@@ -56,6 +56,8 @@ export class AnswersService {
         const answeredAt : Date = new Date();
         submitAnswerDto.submittedAt = answeredAt;
 
+        submitAnswerDto.questionIndex = Number(submitAnswerDto.questionIndex);
+
         try {
             const filter = { userId : submitAnswerDto.userId };
 
@@ -108,6 +110,13 @@ export class AnswersService {
 
             const answers : Set<Answered> = new Set(currentAttempt.answers);
 
+            if(submitAnswerDto.questionIndex && submitAnswerDto.questionIndex <= 100) {
+                answers.forEach((answer) => {
+                    if(answer.number == submitAnswerDto.questionIndex){
+                        answers.delete(answer);
+                    }
+                })
+            }
             const newAnswer : Answered = {
                 number: Number(submitAnswerDto.questionIndex),
                 answer: submitAnswerDto.answer,
@@ -116,7 +125,7 @@ export class AnswersService {
     
             answers.add(newAnswer);
 
-            currentAttempt.answers = Array.from(answers);
+            currentAttempt.answers = Array.from(answers).sort((a, b) => a.number - b.number);
             
             await paper.save();
 
@@ -182,6 +191,25 @@ export class AnswersService {
 
 
     }
+
+
+    async getAnswer(getAnswerRequestDto: GetAnswerRequestDto) {
+        try {
+            const paper : AnsweredPaper = await this.answerPaperModel.findOne({ userId : getAnswerRequestDto.userId , 'attempts.paperId': getAnswerRequestDto.paperId });
+
+            if(paper) {
+                return await paper.attempts[0].answers.find((ans) => ans.number === getAnswerRequestDto.questionIndex);
+
+            }
+
+
+        } catch (err) {
+            throw err;
+          }
+    }
+
+
+
 
     async getFinishedStatus(paperId: string, userId: string) {
         const paper : AnsweredPaper = await this.answerPaperModel.findOne({ userId, 'attempts.paperId': paperId });

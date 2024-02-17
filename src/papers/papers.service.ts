@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paper } from './schemas/paper.schema';
 import { Model, ObjectId, Schema } from 'mongoose';
@@ -15,7 +21,8 @@ export class PapersService {
   constructor(
     @InjectModel(Paper.name) private readonly paperModel: Model<Paper>,
     @InjectModel(Question.name) private readonly questionModel: Model<Question>,
-    @Inject(forwardRef(() => AnswersService)) private readonly answersSerivce: AnswersService,
+    @Inject(forwardRef(() => AnswersService))
+    private readonly answersSerivce: AnswersService,
   ) {}
 
   create(createPaperDto: CreatePaperDto) {
@@ -137,12 +144,19 @@ export class PapersService {
           '-subject -subCategory -module -difficulty -correctAnswer -explaination -_id',
         );
 
+      if (question == null) {
+        throw new HttpException(
+          'No Question found for given index',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
       const getAnswerRequestDto: GetAnswerRequestDto = {
         paperId: paperId,
         questionIndex: question_index,
         userId: userId,
       };
-      
+
       const answer = await this.answersSerivce.getAnswer(getAnswerRequestDto);
 
       const returnObj = {

@@ -7,9 +7,10 @@ import {
   QuestionInterface,
   UpdateQuestionInterface,
 } from './interfaces/question.interface';
-import { Model, ObjectId } from 'mongoose';
+import { Aggregate, Model, ObjectId } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery } from './interfaces/filter.interface';
+import { Filter } from './interfaces/filter.interface';
+import { Pagination } from './interfaces/pagination.interface';
 
 @Injectable()
 export class QuestionsService {
@@ -44,21 +45,156 @@ export class QuestionsService {
     return createdQuestion;
   }
 
-  async findAll(): Promise<Question[]> {
+  async findAll(queryParams: Pagination): Promise<Question[]> {
     return await this.questionModel
       .find({})
+      .limit(queryParams.limit)
+      .skip(queryParams.limit * queryParams.page)
       .select('difficulty type question subject subCategory module')
       .populate('subject', 'name -_id')
       .populate('subCategory', 'name -_id')
       .populate('module', 'name -_id');
   }
 
-  async filter(allQueryParams: FilterQuery) {
-    return this.questionModel
-      .find(allQueryParams)
-      .populate('subject')
-      .populate('subCategory')
-      .populate('module');
+  async filter(allQueryParams: Filter) {
+    let result: any;
+    let numberOfQuestions: number;
+
+    // if allQueryParams ahs filter args 
+    //    filter database with mongoose agrigation
+    // else 
+    //    use find limit and skip
+
+    if (
+      allQueryParams.subject ||
+      allQueryParams.subCategory ||
+      allQueryParams.module
+    ) {
+
+      // two pipelines used to get result docs and total number of questions
+      // TODO: modify this block with a better method. this get the work done but may not be the best method
+
+      const pipeline1 = [
+        {
+          $lookup: {
+            from: 'subjects',
+            localField: 'subject',
+            foreignField: '_id',
+            as: 'subject',
+          },
+        },
+        {
+          $unwind: '$subject',
+        },
+        {
+          $lookup: {
+            from: 'subcategories',
+            localField: 'subCategory',
+            foreignField: '_id',
+            as: 'subCategory',
+          },
+        },
+        {
+          $unwind: '$subCategory',
+        },
+        {
+          $lookup: {
+            from: 'modules',
+            localField: 'module',
+            foreignField: '_id',
+            as: 'module',
+          },
+        },
+        {
+          $unwind: '$module',
+        },
+        {
+          $match: {
+            $or: [
+              { 'subject.name': allQueryParams.subject },
+              { 'subCategory.name': allQueryParams.subCategory },
+              { 'module.name': allQueryParams.module },
+            ],
+          },
+        },
+        {
+          $count: 'totalCount',
+        },
+        {
+          $project: {
+            totalCount: 1, // Keep the count field
+          },
+        },
+      ];
+
+      const pipeline2 = [
+        {
+          $lookup: {
+            from: 'subjects',
+            localField: 'subject',
+            foreignField: '_id',
+            as: 'subject',
+          },
+        },
+        {
+          $unwind: '$subject',
+        },
+        {
+          $lookup: {
+            from: 'subcategories',
+            localField: 'subCategory',
+            foreignField: '_id',
+            as: 'subCategory',
+          },
+        },
+        {
+          $unwind: '$subCategory',
+        },
+        {
+          $lookup: {
+            from: 'modules',
+            localField: 'module',
+            foreignField: '_id',
+            as: 'module',
+          },
+        },
+        {
+          $unwind: '$module',
+        },
+        {
+          $match: {
+            $or: [
+              { 'subject.name': allQueryParams.subject },
+              { 'subCategory.name': allQueryParams.subCategory },
+              { 'module.name': allQueryParams.module },
+            ],
+          },
+        },
+        {
+          $skip: allQueryParams.limit * (allQueryParams.page - 1),
+        },
+        {
+          $limit: allQueryParams.limit * 1,
+        },
+      ];
+
+      const result2 = await this.questionModel.aggregate(pipeline1);
+      result = await this.questionModel.aggregate(pipeline2);
+      numberOfQuestions = result2[0].totalCount;
+
+    } else {
+      numberOfQuestions = await this.questionModel.countDocuments();
+      result = await this.questionModel
+        .find()
+        .skip(allQueryParams.limit * (allQueryParams.page - 1))
+        .limit(allQueryParams.limit);
+    }
+    const pagination = {
+      totalQuestions : numberOfQuestions,
+      page: allQueryParams.page * 1,
+      limit: allQueryParams.limit * 1
+    }
+    return { result, pagination };
   }
 
   async findOne(id: ObjectId): Promise<Question> {

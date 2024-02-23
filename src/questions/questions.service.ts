@@ -123,6 +123,7 @@ export class QuestionsService {
         {
           $project: {
             totalCount: 1, // Keep the count field
+
           },
         },
       ];
@@ -134,6 +135,9 @@ export class QuestionsService {
             localField: 'subject',
             foreignField: '_id',
             as: 'subject',
+            pipeline: [
+              { $project: { name: 1, _id: 0 } }, // Project only name
+            ],
           },
         },
         {
@@ -145,6 +149,9 @@ export class QuestionsService {
             localField: 'subCategory',
             foreignField: '_id',
             as: 'subCategory',
+            pipeline: [
+              { $project: { name: 1, _id: 0 } }, // Project only name
+            ],
           },
         },
         {
@@ -156,10 +163,26 @@ export class QuestionsService {
             localField: 'module',
             foreignField: '_id',
             as: 'module',
+            pipeline: [
+              { $project: { name: 1, _id: 0 } }, // Project only name
+            ],
           },
         },
         {
           $unwind: '$module',
+        },
+        {
+          $project: {
+            // Include only desired fields from the original document
+            _id: 1, // Keep _id if needed, otherwise remove
+            answers: 0,
+            correctAnswer: 0,
+            explaination: 0,
+            // ... other desired fields from your document
+            // subject: '$subject',
+            // subCategory: '$subCategory',
+            // module: '$module',
+          }
         },
         {
           $match: {

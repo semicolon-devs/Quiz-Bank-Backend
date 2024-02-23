@@ -35,6 +35,8 @@ export class AnswersService {
                 }
 
                 attempt.finishedAt = submittedAt;
+                attempt.hasFinished = true;
+
 
                 await paper.save();
 

@@ -179,9 +179,7 @@ export class QuestionsService {
             correctAnswer: 0,
             explaination: 0,
             // ... other desired fields from your document
-            // subject: '$subject',
-            // subCategory: '$subCategory',
-            // module: '$module',
+
           }
         },
         {

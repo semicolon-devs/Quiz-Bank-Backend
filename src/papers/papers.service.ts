@@ -121,7 +121,19 @@ export class PapersService {
   }
 
   findOne(id: ObjectId | string) {
-    return this.paperModel.findById(id).select('-questions');
+    return this.paperModel.aggregate([
+      { $match: { _id: id } },
+      { $project: {
+        _id: 1, // Include necessary fields
+        paperId: 1,
+        name: 1,
+        timeInMinutes: 1,
+        isTimed: 1,
+        paperType:1,
+        questionsCount: { $size: '$questions' }
+      } },
+      { $limit: 1 } // Ensure only one document is returned
+    ]);
   }
 
   findOneInfo(id: ObjectId) {

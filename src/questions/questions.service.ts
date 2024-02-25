@@ -57,162 +57,185 @@ export class QuestionsService {
   }
 
   async filter(allQueryParams: Filter) {
-    let result: any;
-    let numberOfQuestions: number;
+    // let result: any;
+    // let numberOfQuestions: number;
 
-    // if allQueryParams ahs filter args
-    //    filter database with mongoose agrigation
-    // else
-    //    use find limit and skip
+    allQueryParams.search
+      ? (allQueryParams.search = allQueryParams.search)
+      : (allQueryParams.search = '');
+    allQueryParams.subject
+      ? (allQueryParams.subject = allQueryParams.subject)
+      : (allQueryParams.subject = '');
+    allQueryParams.subCategory
+      ? (allQueryParams.subCategory = allQueryParams.subCategory)
+      : (allQueryParams.subCategory = '');
+    allQueryParams.module
+      ? (allQueryParams.module = allQueryParams.module)
+      : (allQueryParams.module = '');
 
-    if (
-      allQueryParams.subject ||
-      allQueryParams.subCategory ||
-      allQueryParams.module
-    ) {
-      // two pipelines used to get result docs and total number of questions
-      // TODO: modify this block with a better method. this get the work done but may not be the best method
+    // two pipelines used to get result docs and total number of questions
+    // TODO: modify this block with a better method. this get the work done but may not be the best method
 
-      const pipeline1 = [
-        {
-          $lookup: {
-            from: 'subjects',
-            localField: 'subject',
-            foreignField: '_id',
-            as: 'subject',
-          },
+    // to get the count of filterd docs
+    const pipeline1 = [
+      {
+        $lookup: {
+          from: 'subjects',
+          localField: 'subject',
+          foreignField: '_id',
+          as: 'subject',
         },
-        {
-          $unwind: '$subject',
+      },
+      {
+        $unwind: '$subject',
+      },
+      {
+        $lookup: {
+          from: 'subcategories',
+          localField: 'subCategory',
+          foreignField: '_id',
+          as: 'subCategory',
         },
-        {
-          $lookup: {
-            from: 'subcategories',
-            localField: 'subCategory',
-            foreignField: '_id',
-            as: 'subCategory',
-          },
+      },
+      {
+        $unwind: '$subCategory',
+      },
+      {
+        $lookup: {
+          from: 'modules',
+          localField: 'module',
+          foreignField: '_id',
+          as: 'module',
         },
-        {
-          $unwind: '$subCategory',
+      },
+      {
+        $unwind: '$module',
+      },
+      {
+        $match: {
+          $and: [
+            {
+              'subject.name': {
+                $regex: allQueryParams.subject,
+                $options: 'i',
+              },
+            },
+            {
+              'subCategory.name': {
+                $regex: allQueryParams.subCategory,
+                $options: 'i',
+              },
+            },
+            {
+              'module.name': { $regex: allQueryParams.module, $options: 'i' },
+            },
+            { question: { $regex: allQueryParams.search, $options: 'i' } },
+          ],
         },
-        {
-          $lookup: {
-            from: 'modules',
-            localField: 'module',
-            foreignField: '_id',
-            as: 'module',
-          },
+      },
+      {
+        $count: 'totalCount',
+      },
+      {
+        $project: {
+          totalCount: 1, // Keep the count field
         },
-        {
-          $unwind: '$module',
-        },
-        {
-          $match: {
-            $or: [
-              { 'subject.name': allQueryParams.subject },
-              { 'subCategory.name': allQueryParams.subCategory },
-              { 'module.name': allQueryParams.module },
-            ],
-          },
-        },
-        {
-          $count: 'totalCount',
-        },
-        {
-          $project: {
-            totalCount: 1, // Keep the count field
-          },
-        },
-      ];
+      },
+    ];
 
-      const pipeline2 = [
-        {
-          $lookup: {
-            from: 'subjects',
-            localField: 'subject',
-            foreignField: '_id',
-            as: 'subject',
-            pipeline: [
-              { $project: { name: 1, _id: 0 } }, // Project only name
-            ],
-          },
+    // to get the filterd docs
+    const pipeline2 = [
+      {
+        $lookup: {
+          from: 'subjects',
+          localField: 'subject',
+          foreignField: '_id',
+          as: 'subject',
+          pipeline: [
+            { $project: { name: 1, _id: 0 } }, // Project only name
+          ],
         },
-        {
-          $unwind: '$subject',
+      },
+      {
+        $unwind: '$subject',
+      },
+      {
+        $lookup: {
+          from: 'subcategories',
+          localField: 'subCategory',
+          foreignField: '_id',
+          as: 'subCategory',
+          pipeline: [
+            { $project: { name: 1, _id: 0 } }, // Project only name
+          ],
         },
-        {
-          $lookup: {
-            from: 'subcategories',
-            localField: 'subCategory',
-            foreignField: '_id',
-            as: 'subCategory',
-            pipeline: [
-              { $project: { name: 1, _id: 0 } }, // Project only name
-            ],
-          },
+      },
+      {
+        $unwind: '$subCategory',
+      },
+      {
+        $lookup: {
+          from: 'modules',
+          localField: 'module',
+          foreignField: '_id',
+          as: 'module',
+          pipeline: [
+            { $project: { name: 1, _id: 0 } }, // Project only name
+          ],
         },
-        {
-          $unwind: '$subCategory',
+      },
+      {
+        $unwind: '$module',
+      },
+      {
+        $project: {
+          _id: 1,
+          answers: 0,
+          correctAnswer: 0,
+          explaination: 0,
         },
-        {
-          $lookup: {
-            from: 'modules',
-            localField: 'module',
-            foreignField: '_id',
-            as: 'module',
-            pipeline: [
-              { $project: { name: 1, _id: 0 } }, // Project only name
-            ],
-          },
+      },
+      {
+        $match: {
+          $and: [
+            {
+              'subject.name': {
+                $regex: allQueryParams.subject,
+                $options: 'i',
+              },
+            },
+            {
+              'subCategory.name': {
+                $regex: allQueryParams.subCategory,
+                $options: 'i',
+              },
+            },
+            {
+              'module.name': { $regex: allQueryParams.module, $options: 'i' },
+            },
+            { question: { $regex: allQueryParams.search, $options: 'i' } },
+          ],
         },
-        {
-          $unwind: '$module',
-        },
-        {
-          $project: {
-            // Include only desired fields from the original document
-            _id: 1, // Keep _id if needed, otherwise remove
-            answers: 0,
-            correctAnswer: 0,
-            explaination: 0,
-            // ... other desired fields from your document
-          },
-        },
-        {
-          $match: {
-            $or: [
-              { 'subject.name': allQueryParams.subject },
-              { 'subCategory.name': allQueryParams.subCategory },
-              { 'module.name': allQueryParams.module },
-            ],
-          },
-        },
-        {
-          $skip: allQueryParams.limit * (allQueryParams.page - 1),
-        },
-        {
-          $limit: allQueryParams.limit * 1,
-        },
-      ];
+      },
+      {
+        $skip: allQueryParams.limit * (allQueryParams.page - 1),
+      },
+      {
+        $limit: allQueryParams.limit * 1,
+      },
+    ];
 
-      const result2 = await this.questionModel.aggregate(pipeline1);
-      result = await this.questionModel.aggregate(pipeline2);
-      numberOfQuestions = result2[0].totalCount;
-    } else {
-      numberOfQuestions = await this.questionModel.countDocuments();
-      result = await this.questionModel
-        .find()
-        .populate('subject', 'name -_id')
-        .populate('subCategory', 'name -_id')
-        .populate('module', 'name -_id')
-        .skip(allQueryParams.limit * (allQueryParams.page - 1))
-        .limit(allQueryParams.limit);
-    }
+    const count = await this.questionModel.aggregate(pipeline1);
+    const result = await this.questionModel.aggregate(pipeline2);
+
+    const numberOfQuestions = count.length > 0 ? count[0].totalCount : 0;
+
+    // details for pagination
     const pagination = {
       totalQuestions: numberOfQuestions,
-      page: allQueryParams.page * 1,
       limit: allQueryParams.limit * 1,
+      page: allQueryParams.page * 1,
+      totalPages: Math.ceil(numberOfQuestions / allQueryParams.limit),
     };
     return { result, pagination };
   }

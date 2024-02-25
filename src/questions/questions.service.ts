@@ -60,9 +60,9 @@ export class QuestionsService {
     let result: any;
     let numberOfQuestions: number;
 
-    // if allQueryParams ahs filter args 
+    // if allQueryParams ahs filter args
     //    filter database with mongoose agrigation
-    // else 
+    // else
     //    use find limit and skip
 
     if (
@@ -70,7 +70,6 @@ export class QuestionsService {
       allQueryParams.subCategory ||
       allQueryParams.module
     ) {
-
       // two pipelines used to get result docs and total number of questions
       // TODO: modify this block with a better method. this get the work done but may not be the best method
 
@@ -123,7 +122,6 @@ export class QuestionsService {
         {
           $project: {
             totalCount: 1, // Keep the count field
-
           },
         },
       ];
@@ -179,8 +177,7 @@ export class QuestionsService {
             correctAnswer: 0,
             explaination: 0,
             // ... other desired fields from your document
-
-          }
+          },
         },
         {
           $match: {
@@ -202,19 +199,21 @@ export class QuestionsService {
       const result2 = await this.questionModel.aggregate(pipeline1);
       result = await this.questionModel.aggregate(pipeline2);
       numberOfQuestions = result2[0].totalCount;
-
     } else {
       numberOfQuestions = await this.questionModel.countDocuments();
       result = await this.questionModel
         .find()
+        .populate('subject', 'name -_id')
+        .populate('subCategory', 'name -_id')
+        .populate('module', 'name -_id')
         .skip(allQueryParams.limit * (allQueryParams.page - 1))
         .limit(allQueryParams.limit);
     }
     const pagination = {
-      totalQuestions : numberOfQuestions,
+      totalQuestions: numberOfQuestions,
       page: allQueryParams.page * 1,
-      limit: allQueryParams.limit * 1
-    }
+      limit: allQueryParams.limit * 1,
+    };
     return { result, pagination };
   }
 

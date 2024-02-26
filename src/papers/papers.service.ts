@@ -15,6 +15,7 @@ import { Question } from 'src/questions/schemas/question.schema';
 import { UpdatePaper } from './dto/update-paper.dto';
 import { GetAnswerRequestDto } from 'src/answers/dto/submit-answers.dto';
 import { AnswersService } from 'src/answers/answers.service';
+import { UpdateQuestionListDto } from './dto/update-questionlist.dto';
 
 @Injectable()
 export class PapersService {
@@ -43,6 +44,15 @@ export class PapersService {
       const questionIds: Set<string> = new Set(result.questions);
 
       reqDto.questionIdArray.forEach((id) => {
+        // check if given id already exists
+        for (let i = 0; i < result.questions.length; i++) {
+          if (result.questions[i] == id) {
+            throw new HttpException(
+              `Duplicate id, ${id} already exists in question list`,
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+        }
         questionIds.add(id);
       });
 
@@ -53,6 +63,25 @@ export class PapersService {
       );
     } catch (err) {
       throw err;
+    }
+  }
+
+  async updateQuestionList(paper_id: ObjectId, payload: UpdateQuestionListDto) {
+    try {
+      const questionList = payload.questionIdArray;
+      return await this.paperModel.findByIdAndUpdate(
+        paper_id,
+        {
+          questions: Array.from(questionList),
+        },
+        { new: true },
+      );
+    } catch (err) {
+      console.log('Error in updating Question List', err);
+      throw new HttpException(
+        'Error in updating Question List',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -123,16 +152,18 @@ export class PapersService {
   findOne(id: ObjectId | string) {
     return this.paperModel.aggregate([
       { $match: { _id: id } },
-      { $project: {
-        _id: 1, // Include necessary fields
-        paperId: 1,
-        name: 1,
-        timeInMinutes: 1,
-        isTimed: 1,
-        paperType:1,
-        questionsCount: { $size: '$questions' }
-      } },
-      { $limit: 1 } // Ensure only one document is returned
+      {
+        $project: {
+          _id: 1, // Include necessary fields
+          paperId: 1,
+          name: 1,
+          timeInMinutes: 1,
+          isTimed: 1,
+          paperType: 1,
+          questionsCount: { $size: '$questions' },
+        },
+      },
+      { $limit: 1 }, // Ensure only one document is returned
     ]);
   }
 

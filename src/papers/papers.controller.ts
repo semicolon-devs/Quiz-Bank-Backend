@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -102,7 +103,7 @@ export class PapersController {
   @Get(':paper_id/:question_index')
   getQuestion(
     @Param('paper_id', ParseObjectIdPipe) paperId: ObjectId,
-    @Param('question_index') question_index: number,
+    @Param('question_index', ParseIntPipe) question_index: number,
     @getCurrentUserId() userId: string,
   ) {
     return this.papersService.findQuestion(paperId, question_index, userId);
@@ -114,7 +115,7 @@ export class PapersController {
   @Get('answer/:paper_id/:question_index')
   getAnswer(
     @Param('paper_id', ParseObjectIdPipe) paperId: ObjectId,
-    @Param('question_index') question_index: number,
+    @Param('question_index', ParseIntPipe) question_index: number,
   ) {
     return this.papersService.findAnswer(paperId, question_index);
   }
@@ -125,7 +126,7 @@ export class PapersController {
   @Delete(':paper_id/:question_index')
   removeQuestion(
     @Param('paper_id', ParseObjectIdPipe) paperId: ObjectId,
-    @Param('question_index') question_index: number,
+    @Param('question_index', ParseIntPipe) question_index: number,
   ) {
     return this.papersService.removeQuestion(paperId, question_index);
   }

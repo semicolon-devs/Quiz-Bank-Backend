@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paper } from './schemas/paper.schema';
-import { Model, ObjectId, Schema } from 'mongoose';
+import { Aggregate, AggregateOptions, Model, ObjectId, Schema } from 'mongoose';
 import { PaperInterface } from './interfaces/createPaper.interface';
 import { CreatePaperDto } from './dto/create-paper.dto';
 import { AddQuestionsDto } from './dto/add-questions.dto';
@@ -15,6 +15,8 @@ import { Question } from 'src/questions/schemas/question.schema';
 import { UpdatePaper } from './dto/update-paper.dto';
 import { GetAnswerRequestDto } from 'src/answers/dto/submit-answers.dto';
 import { AnswersService } from 'src/answers/answers.service';
+import { UpdateQuestionListDto } from './dto/update-questionlist.dto';
+import { Filter } from './interfaces/paper-filter.interface';
 
 @Injectable()
 export class PapersService {
@@ -43,6 +45,15 @@ export class PapersService {
       const questionIds: Set<string> = new Set(result.questions);
 
       reqDto.questionIdArray.forEach((id) => {
+        // check if given id already exists
+        for (let i = 0; i < result.questions.length; i++) {
+          if (result.questions[i] == id) {
+            throw new HttpException(
+              `Duplicate id, ${id} already exists in question list`,
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+        }
         questionIds.add(id);
       });
 
@@ -56,47 +67,116 @@ export class PapersService {
     }
   }
 
-  // TODO: change according to requirement
-  findAll() {
-    return this.paperModel.find({}).populate({
-      path: 'questions',
-      select: 'question module subCategory subject type difficulty',
-      populate: [
+  async updateQuestionList(paper_id: ObjectId, payload: UpdateQuestionListDto) {
+    try {
+      const questionList = payload.questionIdArray;
+      return await this.paperModel.findByIdAndUpdate(
+        paper_id,
         {
-          path: 'module',
-          select: 'name -_id',
+          questions: Array.from(questionList),
         },
-        {
-          path: 'subject',
-          select: 'name -_id',
-        },
-        {
-          path: 'subCategory',
-          select: 'name -_id',
-        },
-      ],
-    });
+        { new: true },
+      );
+    } catch (err) {
+      console.log('Error in updating Question List', err);
+      throw new HttpException(
+        'Error in updating Question List',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
-  findAllAdmin() {
-    return this.paperModel.find({}).populate({
-      path: 'questions',
-      select: 'question module subCategory subject type difficulty',
-      populate: [
-        {
-          path: 'module',
-          select: 'name -_id',
-        },
-        {
-          path: 'subject',
-          select: 'name -_id',
-        },
-        {
-          path: 'subCategory',
-          select: 'name -_id',
-        },
-      ],
-    });
+  // TODO: change according to requirement
+  async findAll(filter: Filter) {
+    filter.name ? (filter.name = filter.name) : (filter.name = '');
+    filter.paperId ? (filter.paperId = filter.paperId) : (filter.paperId = '');
+
+    const result = await this.paperModel
+      .find({
+        name: { $regex: filter.name, $options: 'i' },
+        paperId: { $regex: filter.paperId, $options: 'i' },
+      })
+      .skip((filter.page - 1) * filter.limit)
+      .limit(filter.limit)
+      .populate({
+        path: 'questions',
+        select: 'question module subCategory subject type difficulty answers',
+        populate: [
+          {
+            path: 'module',
+            select: 'name -_id',
+          },
+          {
+            path: 'subject',
+            select: 'name -_id',
+          },
+          {
+            path: 'subCategory',
+            select: 'name -_id',
+          },
+        ],
+      });
+
+    const count = await this.paperModel
+      .find({
+        name: { $regex: filter.name, $options: 'i' },
+        paperId: { $regex: filter.paperId, $options: 'i' },
+      })
+      .count();
+
+    const pagination = {
+      totalPapers: count,
+      limit: filter.limit * 1,
+      totalpages: Math.ceil(count / filter.limit),
+      page: filter.page * 1,
+    };
+    return { result, pagination };
+  }
+
+  async findAllAdmin(filter: Filter) {
+    filter.name ? (filter.name = filter.name) : (filter.name = '');
+    filter.paperId ? (filter.paperId = filter.paperId) : (filter.paperId = '');
+
+    const result = await this.paperModel
+      .find({
+        name: { $regex: filter.name, $options: 'i' },
+        paperId: { $regex: filter.paperId, $options: 'i' },
+      })
+      .skip((filter.page - 1) * filter.limit)
+      .limit(filter.limit)
+      .populate({
+        path: 'questions',
+        select: 'question module subCategory subject type difficulty',
+        populate: [
+          {
+            path: 'module',
+            select: 'name -_id',
+          },
+          {
+            path: 'subject',
+            select: 'name -_id',
+          },
+          {
+            path: 'subCategory',
+            select: 'name -_id',
+          },
+        ],
+      });
+
+    const count = await this.paperModel
+      .find({
+        name: { $regex: filter.name, $options: 'i' },
+        paperId: { $regex: filter.paperId, $options: 'i' },
+      })
+      .count();
+
+    const pagination = {
+      totalPapers: count,
+      limit: filter.limit * 1,
+      totalpages: Math.ceil(count / filter.limit),
+      page: filter.page * 1,
+    };
+    return { result, pagination };
   }
 
   findOneAdmin(id: ObjectId) {
@@ -123,16 +203,18 @@ export class PapersService {
   findOne(id: ObjectId | string) {
     return this.paperModel.aggregate([
       { $match: { _id: id } },
-      { $project: {
-        _id: 1, // Include necessary fields
-        paperId: 1,
-        name: 1,
-        timeInMinutes: 1,
-        isTimed: 1,
-        paperType:1,
-        questionsCount: { $size: '$questions' }
-      } },
-      { $limit: 1 } // Ensure only one document is returned
+      {
+        $project: {
+          _id: 1, // Include necessary fields
+          paperId: 1,
+          name: 1,
+          timeInMinutes: 1,
+          isTimed: 1,
+          paperType: 1,
+          questionsCount: { $size: '$questions' },
+        },
+      },
+      { $limit: 1 }, // Ensure only one document is returned
     ]);
   }
 

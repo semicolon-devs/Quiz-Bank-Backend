@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { PapersService } from './papers.service';
@@ -18,11 +19,14 @@ import { Role } from 'src/enums/roles.enum';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UpdatePaper } from './dto/update-paper.dto';
 import { getCurrentUserId } from 'src/auth/decorator/user-id.decorator';
+import { UpdateQuestionListDto } from './dto/update-questionlist.dto';
+import { Filter } from './interfaces/paper-filter.interface';
 
 @Controller('api/v1/papers')
 export class PapersController {
   constructor(private readonly papersService: PapersService) {}
 
+  // to create a new paper (empty question array)
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.MODERATOR)
   @Post()
@@ -30,6 +34,7 @@ export class PapersController {
     return this.papersService.create(createPaperDto);
   }
 
+  // to add questions
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.MODERATOR)
   @Post('add/:id')
@@ -40,22 +45,34 @@ export class PapersController {
     return this.papersService.addQuestion(paper_id, addQuestionsDto);
   }
 
+  // to update question array entirely. (for set the order of questions)
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN, Role.MODERATOR)
+  @Patch('update-questions/:id')
+  updateQuestionsList(
+    @Param('id', ParseObjectIdPipe) paper_id: ObjectId,
+    @Body() updateQuestionsDto: UpdateQuestionListDto,
+  ) {
+    return this.papersService.updateQuestionList(paper_id, updateQuestionsDto);
+  }
+
   // to get list available papers to users
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
   @Get()
-  findAll() {
-    return this.papersService.findAll();
+  findAll(@Query() filter: Filter) {
+    return this.papersService.findAll(filter);
   }
 
-  // to list already questions in add question page
+  // to list already added questions in add question page
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN)
   @Get('/admin')
-  findAllAdmin() {
-    return this.papersService.findAllAdmin();
+  findAllAdmin(@Query() filter: Filter) {
+    return this.papersService.findAllAdmin(filter);
   }
 
+  // get one paper (for admin)
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.MODERATOR)
   @Get('admin/:id')
@@ -63,6 +80,7 @@ export class PapersController {
     return this.papersService.findOneAdmin(id);
   }
 
+  // get one paper (for user -> without correct answer and explaination)
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
   @Get(':id')
@@ -78,17 +96,19 @@ export class PapersController {
     return this.papersService.findOneInfo(id);
   }
 
+  // get full question by question number and paper ( for show to user)
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
   @Get(':paper_id/:question_index')
   getQuestion(
     @Param('paper_id', ParseObjectIdPipe) paperId: ObjectId,
     @Param('question_index') question_index: number,
-    @getCurrentUserId() userId : string
+    @getCurrentUserId() userId: string,
   ) {
     return this.papersService.findQuestion(paperId, question_index, userId);
   }
 
+  // get the correct answer of a question
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
   @Get('answer/:paper_id/:question_index')
@@ -99,6 +119,7 @@ export class PapersController {
     return this.papersService.findAnswer(paperId, question_index);
   }
 
+  // to remove question from a paper
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.MODERATOR)
   @Delete(':paper_id/:question_index')
@@ -109,6 +130,7 @@ export class PapersController {
     return this.papersService.removeQuestion(paperId, question_index);
   }
 
+  // to remove entire paper
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.MODERATOR)
   @Delete(':paper_id')
@@ -116,6 +138,7 @@ export class PapersController {
     return this.papersService.removePaper(paperId);
   }
 
+  // to update paper details. not question list
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.MODERATOR)
   @Patch(':paper_id')

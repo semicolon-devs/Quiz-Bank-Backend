@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { PapersService } from './papers.service';
@@ -19,6 +20,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UpdatePaper } from './dto/update-paper.dto';
 import { getCurrentUserId } from 'src/auth/decorator/user-id.decorator';
 import { UpdateQuestionListDto } from './dto/update-questionlist.dto';
+import { Filter } from './interfaces/paper-filter.interface';
 
 @Controller('api/v1/papers')
 export class PapersController {
@@ -58,16 +60,16 @@ export class PapersController {
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
   @Get()
-  findAll() {
-    return this.papersService.findAll();
+  findAll(@Query() filter: Filter) {
+    return this.papersService.findAll(filter);
   }
 
   // to list already added questions in add question page
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN)
   @Get('/admin')
-  findAllAdmin() {
-    return this.papersService.findAllAdmin();
+  findAllAdmin(@Query() filter: Filter) {
+    return this.papersService.findAllAdmin(filter);
   }
 
   // get one paper (for admin)
@@ -101,7 +103,7 @@ export class PapersController {
   getQuestion(
     @Param('paper_id', ParseObjectIdPipe) paperId: ObjectId,
     @Param('question_index') question_index: number,
-    @getCurrentUserId() userId : string
+    @getCurrentUserId() userId: string,
   ) {
     return this.papersService.findQuestion(paperId, question_index, userId);
   }

@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paper } from './schemas/paper.schema';
-import { Model, ObjectId, Schema } from 'mongoose';
+import { Aggregate, AggregateOptions, Model, ObjectId, Schema } from 'mongoose';
 import { PaperInterface } from './interfaces/createPaper.interface';
 import { CreatePaperDto } from './dto/create-paper.dto';
 import { AddQuestionsDto } from './dto/add-questions.dto';
@@ -16,6 +16,7 @@ import { UpdatePaper } from './dto/update-paper.dto';
 import { GetAnswerRequestDto } from 'src/answers/dto/submit-answers.dto';
 import { AnswersService } from 'src/answers/answers.service';
 import { UpdateQuestionListDto } from './dto/update-questionlist.dto';
+import { Filter } from './interfaces/paper-filter.interface';
 
 @Injectable()
 export class PapersService {
@@ -86,46 +87,96 @@ export class PapersService {
   }
 
   // TODO: change according to requirement
-  findAll() {
-    return this.paperModel.find({}).populate({
-      path: 'questions',
-      select: 'question module subCategory subject type difficulty',
-      populate: [
-        {
-          path: 'module',
-          select: 'name -_id',
-        },
-        {
-          path: 'subject',
-          select: 'name -_id',
-        },
-        {
-          path: 'subCategory',
-          select: 'name -_id',
-        },
-      ],
-    });
+  async findAll(filter: Filter) {
+    filter.name ? (filter.name = filter.name) : (filter.name = '');
+    filter.paperId ? (filter.paperId = filter.paperId) : (filter.paperId = '');
+
+    const result = await this.paperModel
+      .find({
+        name: { $regex: filter.name, $options: 'i' },
+        paperId: { $regex: filter.paperId, $options: 'i' },
+      })
+      .skip((filter.page - 1) * filter.limit)
+      .limit(filter.limit)
+      .populate({
+        path: 'questions',
+        select: 'question module subCategory subject type difficulty answers',
+        populate: [
+          {
+            path: 'module',
+            select: 'name -_id',
+          },
+          {
+            path: 'subject',
+            select: 'name -_id',
+          },
+          {
+            path: 'subCategory',
+            select: 'name -_id',
+          },
+        ],
+      });
+
+    const count = await this.paperModel
+      .find({
+        name: { $regex: filter.name, $options: 'i' },
+        paperId: { $regex: filter.paperId, $options: 'i' },
+      })
+      .count();
+
+    const pagination = {
+      totalPapers: count,
+      limit: filter.limit * 1,
+      totalpages: Math.ceil(count / filter.limit),
+      page: filter.page * 1,
+    };
+    return { result, pagination };
   }
 
-  findAllAdmin() {
-    return this.paperModel.find({}).populate({
-      path: 'questions',
-      select: 'question module subCategory subject type difficulty',
-      populate: [
-        {
-          path: 'module',
-          select: 'name -_id',
-        },
-        {
-          path: 'subject',
-          select: 'name -_id',
-        },
-        {
-          path: 'subCategory',
-          select: 'name -_id',
-        },
-      ],
-    });
+  async findAllAdmin(filter: Filter) {
+    filter.name ? (filter.name = filter.name) : (filter.name = '');
+    filter.paperId ? (filter.paperId = filter.paperId) : (filter.paperId = '');
+
+    const result = await this.paperModel
+      .find({
+        name: { $regex: filter.name, $options: 'i' },
+        paperId: { $regex: filter.paperId, $options: 'i' },
+      })
+      .skip((filter.page - 1) * filter.limit)
+      .limit(filter.limit)
+      .populate({
+        path: 'questions',
+        select: 'question module subCategory subject type difficulty',
+        populate: [
+          {
+            path: 'module',
+            select: 'name -_id',
+          },
+          {
+            path: 'subject',
+            select: 'name -_id',
+          },
+          {
+            path: 'subCategory',
+            select: 'name -_id',
+          },
+        ],
+      });
+
+    const count = await this.paperModel
+      .find({
+        name: { $regex: filter.name, $options: 'i' },
+        paperId: { $regex: filter.paperId, $options: 'i' },
+      })
+      .count();
+
+    const pagination = {
+      totalPapers: count,
+      limit: filter.limit * 1,
+      totalpages: Math.ceil(count / filter.limit),
+      page: filter.page * 1,
+    };
+    return { result, pagination };
   }
 
   findOneAdmin(id: ObjectId) {

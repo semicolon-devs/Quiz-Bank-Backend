@@ -280,21 +280,35 @@ export class PapersService {
     }
   }
 
-  async removeQuestion(paperId: ObjectId, question_index: number) {
+  async removeQuestion(paperId: ObjectId, question_id: ObjectId) {
     try {
       const questions = await this.paperModel
         .findById(paperId)
         .select('questions -_id');
       const questionIdArray: Set<string> = new Set(questions.questions);
 
-      questionIdArray.delete(
-        Array.from(questionIdArray).at(question_index - 1),
-      );
-      return await this.paperModel.findByIdAndUpdate(
-        paperId,
-        { questions: Array.from(questionIdArray) },
-        { new: true },
-      );
+      let isRemoved: boolean = false;
+
+      questionIdArray.forEach((question) => {
+        if (question == question_id.toString()) {
+          questionIdArray.delete(question);
+          isRemoved = true;
+        }
+      });
+
+      if (!isRemoved) {
+        throw new HttpException(
+          'given id not  found in the question ids array',
+          HttpStatus.BAD_REQUEST,
+        );
+        
+      } else {
+        return await this.paperModel.findByIdAndUpdate(
+          paperId,
+          { questions: Array.from(questionIdArray) },
+          { new: true },
+        );
+      }
     } catch (err) {
       throw err;
     }

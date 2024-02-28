@@ -123,12 +123,12 @@ export class PapersController {
   // to remove question from a paper
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.MODERATOR)
-  @Delete(':paper_id/:question_index')
+  @Delete(':paper_id/:question_id')
   removeQuestion(
     @Param('paper_id', ParseObjectIdPipe) paperId: ObjectId,
-    @Param('question_index', ParseIntPipe) question_index: number,
+    @Param('question_id', ParseObjectIdPipe) question_id: ObjectId,
   ) {
-    return this.papersService.removeQuestion(paperId, question_index);
+    return this.papersService.removeQuestion(paperId, question_id);
   }
 
   // to remove entire paper

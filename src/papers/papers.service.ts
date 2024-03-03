@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Paper } from './schemas/paper.schema';
-import { Aggregate, AggregateOptions, Model, ObjectId, Schema } from 'mongoose';
+import { Model, ObjectId, Schema } from 'mongoose';
 import { PaperInterface } from './interfaces/createPaper.interface';
 import { CreatePaperDto } from './dto/create-paper.dto';
 import { AddQuestionsDto } from './dto/add-questions.dto';
@@ -95,9 +95,11 @@ export class PapersService {
       .find({
         name: { $regex: filter.name, $options: 'i' },
         paperId: { $regex: filter.paperId, $options: 'i' },
+        isArchived: false,
       })
       .skip((filter.page - 1) * filter.limit)
       .limit(filter.limit)
+      .select('-isArchived')
       .populate({
         path: 'questions',
         select: 'question module subCategory subject type difficulty answers',
@@ -141,9 +143,59 @@ export class PapersService {
       .find({
         name: { $regex: filter.name, $options: 'i' },
         paperId: { $regex: filter.paperId, $options: 'i' },
+        isArchived: false,
       })
       .skip((filter.page - 1) * filter.limit)
       .limit(filter.limit)
+      .select('-isArchived')
+      .populate({
+        path: 'questions',
+        select: 'question module subCategory subject type difficulty',
+        populate: [
+          {
+            path: 'module',
+            select: 'name -_id',
+          },
+          {
+            path: 'subject',
+            select: 'name -_id',
+          },
+          {
+            path: 'subCategory',
+            select: 'name -_id',
+          },
+        ],
+      });
+
+    const count = await this.paperModel
+      .find({
+        name: { $regex: filter.name, $options: 'i' },
+        paperId: { $regex: filter.paperId, $options: 'i' },
+      })
+      .count();
+
+    const pagination = {
+      totalPapers: count,
+      limit: filter.limit * 1,
+      totalpages: Math.ceil(count / filter.limit),
+      page: filter.page * 1,
+    };
+    return { result, pagination };
+  }
+
+  async findAllArchived(filter: Filter) {
+    filter.name ? (filter.name = filter.name) : (filter.name = '');
+    filter.paperId ? (filter.paperId = filter.paperId) : (filter.paperId = '');
+
+    const result = await this.paperModel
+      .find({
+        name: { $regex: filter.name, $options: 'i' },
+        paperId: { $regex: filter.paperId, $options: 'i' },
+        isArchived: true,
+      })
+      .skip((filter.page - 1) * filter.limit)
+      .limit(filter.limit)
+      .select('-isArchived')
       .populate({
         path: 'questions',
         select: 'question module subCategory subject type difficulty',
@@ -301,7 +353,6 @@ export class PapersService {
           'given id not  found in the question ids array',
           HttpStatus.BAD_REQUEST,
         );
-        
       } else {
         return await this.paperModel.findByIdAndUpdate(
           paperId,
@@ -314,8 +365,17 @@ export class PapersService {
     }
   }
 
-  removePaper(paperId: Schema.Types.ObjectId) {
-    return this.paperModel.findByIdAndRemove(paperId);
+  async removePaper(paperId: Schema.Types.ObjectId) {
+    const papername = await this.paperModel
+      .findById(paperId)
+      .select('name -_id');
+    console.log(papername);
+
+    return await this.paperModel.findByIdAndUpdate(
+      paperId,
+      { isArchived: true, name: papername.name + '-archived' },
+      { new: true },
+    );
   }
 
   updatePaper(paperId: Schema.Types.ObjectId, payload: UpdatePaper) {

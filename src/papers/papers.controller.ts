@@ -73,6 +73,14 @@ export class PapersController {
     return this.papersService.findAllAdmin(filter);
   }
 
+  // get all archived papers
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN)
+  @Get('/archived')
+  findAllArchived(@Query() filter: Filter) {
+    return this.papersService.findAllArchived(filter);
+  }
+
   // get one paper (for admin)
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.MODERATOR)

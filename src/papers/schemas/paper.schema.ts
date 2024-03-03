@@ -21,7 +21,7 @@ export class Paper {
     default: false,
   })
   isTimed: boolean;
-  
+
   @Prop({
     type: String,
     enum: PaperType,
@@ -30,8 +30,18 @@ export class Paper {
   })
   paperType: PaperType;
 
-  @Prop([{ type: mongoose.Schema.Types.ObjectId, ref:"Question", required: true, default: [] }])
+  @Prop([
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Question',
+      required: true,
+      default: [],
+    },
+  ])
   questions: string;
+
+  @Prop({ type: Boolean, required: true, default: false })
+  isArchived: boolean;
 }
 
 export const PaperSchema = SchemaFactory.createForClass(Paper);

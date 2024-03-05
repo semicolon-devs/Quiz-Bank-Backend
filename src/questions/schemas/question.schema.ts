@@ -50,6 +50,9 @@ export class Question {
 
   @Prop({ type: String, maxlength: 20 * 1024 * 1024, required: true })
   explaination: string;
+
+  @Prop({ type: Boolean, required: true, default: false })
+  isArchived: boolean;
 }
 
 export const QuestionSchema = SchemaFactory.createForClass(Question);

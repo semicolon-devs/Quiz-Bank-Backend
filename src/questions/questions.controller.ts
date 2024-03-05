@@ -45,6 +45,14 @@ export class QuestionsController {
     return this.questionsService.filter(allQueryParams);
   }
 
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+  @Get('archived')
+  getArchived(@Query() allQueryParams: Filter) {
+    return this.questionsService.findAllArchived(allQueryParams);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
   @Get(':id')

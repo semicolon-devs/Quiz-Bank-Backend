@@ -70,13 +70,40 @@ export class PapersService {
   async updateQuestionList(paper_id: ObjectId, payload: UpdateQuestionListDto) {
     try {
       const questionList = payload.questionIdArray;
-      return await this.paperModel.findByIdAndUpdate(
+
+      // get current paper details
+      const paper = await this.paperModel
+        .findById(paper_id)
+        .select('name paperId timeInMinutes isTimed paperType -_id');
+      console.log(paper);
+
+      // update current paper as a archived paper
+      const oldPaper = await this.paperModel.findByIdAndUpdate(
         paper_id,
         {
-          questions: Array.from(questionList),
+          isArchived: true,
+          paperId: 'Archived - ' + paper.paperId + '-' + Date.now(),
+          name: 'Archived - ' + paper.name + '-' + Date.now(),
         },
         { new: true },
       );
+      // console.log(oldPaper);
+      
+
+      // create a new paper from  current paper details and new questions
+      const newPaper: PaperInterface = {
+        paperId: paper.paperId,
+        name: paper.name,
+        timeInMinutes: paper.timeInMinutes,
+        isTimed: paper.isTimed,
+        paperType: paper.paperType,
+        questions: Array.from(questionList),
+      };
+
+      const newPaperUpdated = await this.paperModel.create(newPaper);
+      console.log(newPaperUpdated);
+      
+      return newPaperUpdated;
     } catch (err) {
       console.log('Error in updating Question List', err);
       throw new HttpException(
@@ -368,18 +395,28 @@ export class PapersService {
   async removePaper(paperId: Schema.Types.ObjectId) {
     const papername = await this.paperModel
       .findById(paperId)
-      .select('name -_id');
-    console.log(papername);
+      .select('name paperId isArchived -_id');
 
-    return await this.paperModel.findByIdAndUpdate(
-      paperId,
-      { isArchived: true, name: papername.name + '-archived' },
-      { new: true },
-    );
+    if (papername.isArchived == false) {
+      return await this.paperModel.findByIdAndUpdate(
+        paperId,
+        {
+          isArchived: true,
+          paperId: 'Archived-' + papername.paperId + '-' + Date.now(),
+          name: 'Archived - ' + papername.name + '-' + Date.now(),
+        },
+        { new: true },
+      );
+    } else {
+      throw new HttpException(
+        'Question is Already Archived',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   updatePaper(paperId: Schema.Types.ObjectId, payload: UpdatePaper) {
-    return this.paperModel.findByIdAndUpdate(paperId, payload);
+    return this.paperModel.findByIdAndUpdate(paperId, payload, { new: true });
   }
 
   async getNumberOfQuestions(paperId: string) {

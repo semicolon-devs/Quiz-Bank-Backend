@@ -6,4 +6,5 @@ export interface PaperInterface {
     timeInMinutes: Number;
     isTimed: boolean;
     paperType: PaperType;
+    questions?: string[];
 }

@@ -42,6 +42,12 @@ export class Paper {
 
   @Prop({ type: Boolean, required: true, default: false })
   isArchived: boolean;
+
+  @Prop()
+  createdAt?: Date;
+
+  @Prop()
+  updatedAt?: Date;
 }
 
 export const PaperSchema = SchemaFactory.createForClass(Paper);

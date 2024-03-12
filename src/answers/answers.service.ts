@@ -266,12 +266,17 @@ export class AnswersService {
                                         isCorrect: false
                                     }
 
-                if(answer.correctAnswer.includes( Number(answeredQuestion.answer) ) ) {
+                // if(answer.correctAnswer.includes( Number(answeredQuestion.answer) ) ) {
+                //     ans.isCorrect = true;
+                // }else {
+                //     ans.isCorrect = false;
+                // }
+
+                if(answer.correctAnswer.every( answer => answeredQuestion.answer.includes(Number(answer))) ) {
                     ans.isCorrect = true;
                 }else {
                     ans.isCorrect = false;
                 }
-
 
                 answers.push(ans);
             }

@@ -238,7 +238,7 @@ export class AnswersService {
             for(const answeredQuestion of answeredQuestionsArray) {
                 const answer = await this.paperService.findAnswer(paperId, answeredQuestion.number);
 
-                if(answer.correctAnswer.includes( Number(answeredQuestion.answer) ) ) {
+                if(answer.correctAnswer.every( answer => answeredQuestion.answer.includes(Number(answer))) ) {
                     totalMarks++;
                 }
             }

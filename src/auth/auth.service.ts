@@ -58,7 +58,7 @@ export class AuthService {
     this.usersService.resetPasssword(payload);
   }
 
-  async getTokens(email: string, firstname: string) {   
+  private async getTokens(email: string, firstname: string) {   
     const accessToken = this.jwtService.sign(
       {
         email: email,

@@ -13,7 +13,7 @@ import { PapersService } from 'src/papers/papers.service';
 @Injectable()
 export class AnswersService {
     constructor(
-        @InjectModel(AnsweredPaper.name) private readonly answerPaperModel : Model<AnsweredPaper>,
+        @InjectModel(AnsweredPaper.name, 'quizbank') private readonly answerPaperModel : Model<AnsweredPaper>,
         @Inject(forwardRef(() => PapersService)) private readonly paperService: PapersService
     ) {}
 

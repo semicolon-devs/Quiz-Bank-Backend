@@ -9,10 +9,7 @@ import {
 } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { UsersService } from 'src/users/users.service';
-import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
 import { Role } from 'src/enums/roles.enum';
 import { Roles } from './decorator/roles.decorator';
 import { UserInterface } from 'src/users/interfaces/user.interface';
@@ -20,6 +17,9 @@ import { ForgetPasswordRequest } from 'src/auth/dto/forget-password.dto';
 import { PasswordResetDto } from './dto/passwordReset.dto';
 import { User } from 'src/users/schemas/user.schema';
 import { ForgetPasswordReset } from './dto/forgetPasswordReset.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
+import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @Controller('api/v1/auth')
 export class AuthController {

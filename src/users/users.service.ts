@@ -1,29 +1,23 @@
 import {
-  HttpCode,
-  HttpException,
-  HttpStatus,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
-import { Model, ObjectId } from 'mongoose';
+import { Model } from 'mongoose';
 import { RegisterDto } from 'src/auth/dto/register.dto';
 import * as bcrypt from 'bcrypt';
 import { Role } from 'src/enums/roles.enum';
 import { UserInterface } from './interfaces/user.interface';
-import moment from 'moment';
 import { ForgetPasswordRequest } from './interfaces/forget_password_request.interface';
 import { ForgetPasswordReset } from './interfaces/ForgetPasswordReset.interface';
-import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 
 const saltOrRounds = 10;
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(User.name, 'quizbank') private readonly userModel: Model<User>,
   ) {}
 
   async create(registerDto: RegisterDto, roles: Role[]): Promise<User> {

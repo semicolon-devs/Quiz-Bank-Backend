@@ -11,7 +11,7 @@ import { PapersModule } from 'src/papers/papers.module';
 
     MongooseModule.forFeature([
       { name: AnsweredPaper.name, schema: AnsweredPaperSchema},
-    ]),
+    ], 'quizbank'),
 
   ],
   

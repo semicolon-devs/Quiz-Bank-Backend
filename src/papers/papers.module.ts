@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Paper, PaperSchema } from './schemas/paper.schema';
 import { Question, QuestionSchema } from 'src/questions/schemas/question.schema';
 import { AnswersModule } from 'src/answers/answers.module';
+import { QuestionsModule } from 'src/questions/questions.module';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { AnswersModule } from 'src/answers/answers.module';
     MongooseModule.forFeature([
       { name: Paper.name, schema: PaperSchema },
       { name: Question.name, schema: QuestionSchema },
-    ]),
+    ], 'quizbank'),
 
   ],
   providers: [PapersService],

@@ -15,7 +15,7 @@ import { Pagination } from './interfaces/pagination.interface';
 @Injectable()
 export class QuestionsService {
   constructor(
-    @InjectModel(Question.name) private readonly questionModel: Model<Question>,
+    @InjectModel(Question.name, 'quizbank') private readonly questionModel: Model<Question>,
   ) {}
 
   async create(createQuestionDto: CreateQuestionDto): Promise<Question> {

@@ -17,11 +17,11 @@ import { ObjectId } from 'mongoose';
 import { AddQuestionsDto } from './dto/add-questions.dto';
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { Role } from 'src/enums/roles.enum';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UpdatePaper } from './dto/update-paper.dto';
 import { getCurrentUserId } from 'src/auth/decorator/user-id.decorator';
 import { UpdateQuestionListDto } from './dto/update-questionlist.dto';
 import { Filter } from './interfaces/paper-filter.interface';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('api/v1/papers')
 export class PapersController {

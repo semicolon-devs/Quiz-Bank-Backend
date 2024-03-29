@@ -21,8 +21,10 @@ import { Filter } from './interfaces/paper-filter.interface';
 @Injectable()
 export class PapersService {
   constructor(
-    @InjectModel(Paper.name) private readonly paperModel: Model<Paper>,
-    @InjectModel(Question.name) private readonly questionModel: Model<Question>,
+    @InjectModel(Paper.name, 'quizbank')
+    private readonly paperModel: Model<Paper>,
+    @InjectModel(Question.name, 'quizbank')
+    private readonly questionModel: Model<Question>,
     @Inject(forwardRef(() => AnswersService))
     private readonly answersSerivce: AnswersService,
   ) {}

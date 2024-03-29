@@ -6,6 +6,7 @@ import { PapersModule } from './papers/papers.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from './users/users.module';
 import { User, UserSchema } from './users/schemas/user.schema';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { User, UserSchema } from './users/schemas/user.schema';
     NotesModule,
     PapersModule,
     UsersModule,
+    SettingsModule,
     RouterModule.register([
       {
         path: 'api/v1/lms',
@@ -29,6 +31,10 @@ import { User, UserSchema } from './users/schemas/user.schema';
           {
             path: 'papers',
             module: PapersModule,
+          },
+          {
+            path: 'settings',
+            module: SettingsModule,
           },
         ],
       },

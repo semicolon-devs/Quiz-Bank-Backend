@@ -23,18 +23,13 @@ export class AuthService {
     return await this.getTokens(user.email);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
+  async refreshTokens(user: User) {
+    return await this.getTokens(user.email);
   }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
+  async removeUser(id: string): Promise<User> {
+    return  this.usersService.delete(id);
   }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
-  }
-
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findOne(email);

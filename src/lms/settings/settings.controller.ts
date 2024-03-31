@@ -51,4 +51,11 @@ export class SettingsController {
   async deleteAllSettings() {
     return await this.settingsService.delete();
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN)
+  @Delete()
+  async deleteAllData() {
+    return await this.settingsService.deleteAllData();
+  }
 }

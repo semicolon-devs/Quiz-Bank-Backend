@@ -5,12 +5,14 @@ import { Settings as ISettings } from './interfaces/settings.interface';
 import { Model } from 'mongoose';
 import { SettingsDto } from './dto/create-settings.dto';
 import { UpdateSettingsDto } from './dto/update-settings.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class SettingsService {
   constructor(
     @InjectModel(Settings.name, 'lms')
     private readonly settingsmodel: Model<Settings>,
+    private userServices: UsersService,
   ) {}
 
   // only use this if necceocery, use the update route to change settings
@@ -33,5 +35,10 @@ export class SettingsService {
 
   async delete() {
     return this.settingsmodel.deleteMany({});
+  }
+
+  // TODO: add other data to delete
+  async deleteAllData() {
+    return this.userServices.deleteAll();
   }
 }

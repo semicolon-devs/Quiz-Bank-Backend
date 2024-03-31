@@ -1,6 +1,4 @@
-import {
-  Injectable,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User as UserSchema } from './schemas/user.schema';
 import { Model } from 'mongoose';
@@ -13,11 +11,11 @@ const saltOrRounds = 10;
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel(UserSchema.name, 'lms') private readonly userModel: Model<User>,
+    @InjectModel(UserSchema.name, 'lms')
+    private readonly userModel: Model<User>,
   ) {}
 
   async register(registerDto: CreateAuthDto): Promise<User> {
-    
     const hash = await bcrypt.hash(registerDto.password, saltOrRounds);
 
     const user: User = {
@@ -45,6 +43,11 @@ export class UsersService {
     const deletedUser = await this.userModel
       .findByIdAndRemove({ _id: id })
       .exec();
+    return deletedUser;
+  }
+
+  async deleteAll(): Promise<any> {
+    const deletedUser = await this.userModel.deleteMany({}).exec();
     return deletedUser;
   }
 }

@@ -1,1 +1,4 @@
-export class CreatePaperDto {}
+export class CreatePaperDto {
+  fileId: string;
+  title: string;
+}

@@ -54,7 +54,7 @@ export class SettingsController {
 
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN)
-  @Delete()
+  @Delete('all')
   async deleteAllData() {
     return await this.settingsService.deleteAllData();
   }

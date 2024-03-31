@@ -35,4 +35,8 @@ export class PapersService {
   remove(id: ObjectId) {
     return this.paperModel.findByIdAndRemove(id);
   }
+
+  removeAll() {
+    return this.paperModel.deleteMany({});
+  }
 }

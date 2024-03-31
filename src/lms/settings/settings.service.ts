@@ -6,6 +6,8 @@ import { Model } from 'mongoose';
 import { SettingsDto } from './dto/create-settings.dto';
 import { UpdateSettingsDto } from './dto/update-settings.dto';
 import { UsersService } from '../users/users.service';
+import { PapersService } from '../papers/papers.service';
+import { NotesService } from '../notes/notes.service';
 
 @Injectable()
 export class SettingsService {
@@ -13,6 +15,8 @@ export class SettingsService {
     @InjectModel(Settings.name, 'lms')
     private readonly settingsmodel: Model<Settings>,
     private userServices: UsersService,
+    private paperService: PapersService,
+    private noteService: NotesService,
   ) {}
 
   // only use this if necceocery, use the update route to change settings
@@ -39,6 +43,8 @@ export class SettingsService {
 
   // TODO: add other data to delete
   async deleteAllData() {
-    return this.userServices.deleteAll();
+    await this.userServices.deleteAll();
+    await this.noteService.removeAll();
+    await this.paperService.removeAll();
   }
 }

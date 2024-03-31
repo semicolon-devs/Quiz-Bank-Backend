@@ -6,6 +6,7 @@ import {
   Delete,
   Request,
   UseGuards,
+  Get,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
@@ -38,6 +39,13 @@ export class AuthController {
   @Post('refresh-token')
   async refreshToken(@Request() request: any): Promise<any> {
     return this.authService.refreshTokens(request.user);
+  }
+
+  @UseGuards(JwtAuthGuardQBank)
+  @Roles(Role.ADMIN, Role.MODERATOR)
+  @Get('users/all')
+  async getAllUserDetails() {
+    return this.authService.getAllUserDetails();
   }
 
   // need to authenticate with a jwt token for qbank moderator or Admin

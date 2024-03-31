@@ -6,6 +6,7 @@ import { User } from '../users/interfaces/user.interface';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import { ObjectId } from 'mongoose';
 
 @Injectable()
 export class AuthService {
@@ -28,7 +29,11 @@ export class AuthService {
   }
 
   async removeUser(id: string): Promise<User> {
-    return  this.usersService.delete(id);
+    return this.usersService.delete(id);
+  }
+
+  async getAllUserDetails(): Promise<User[]> {
+    return this.usersService.findAll();
   }
 
   async validateUser(email: string, password: string): Promise<any> {

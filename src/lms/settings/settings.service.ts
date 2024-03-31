@@ -46,5 +46,7 @@ export class SettingsService {
     await this.userServices.deleteAll();
     await this.noteService.removeAll();
     await this.paperService.removeAll();
+
+    return 'all data deleted';
   }
 }

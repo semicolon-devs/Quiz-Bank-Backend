@@ -22,6 +22,7 @@ export class UsersService {
       name: registerDto.name,
       email: registerDto.email,
       password: hash,
+      key: registerDto.password,
     };
     const createdUser = await this.userModel.create(user);
     return createdUser;
@@ -31,12 +32,16 @@ export class UsersService {
     const hash = await bcrypt.hash(newPassword, saltOrRounds);
 
     return this.userModel
-      .findOneAndUpdate({ email: email }, { password: hash })
+      .findOneAndUpdate({ email: email }, { password: hash, key: newPassword })
       .exec();
   }
 
   async findOne(email: string): Promise<User> {
     return this.userModel.findOne({ email: email }).exec();
+  }
+
+  async findAll(): Promise<User[]> {
+    return this.userModel.find({});
   }
 
   async delete(id: string): Promise<User> {

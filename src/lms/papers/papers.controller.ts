@@ -29,7 +29,8 @@ export class PapersController {
     return this.papersService.create(createPaperDto);
   }
 
-  @UseGuards(JwtAuthGuardQBank, JwtAuthGuard)
+  @UseGuards(JwtAuthGuardQBank)
+  @Roles(Role.ADMIN, Role.MODERATOR)
   @Get()
   findAll() {
     return this.papersService.findAll();

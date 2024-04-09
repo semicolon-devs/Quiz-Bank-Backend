@@ -16,6 +16,7 @@ export class NotesService {
     const note: INote = {
       title: createNoteDto.title,
       fileId: createNoteDto.fileId,
+      subject: createNoteDto.subject,
     };
     return this.noteModel.create(note);
   }

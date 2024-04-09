@@ -10,6 +10,9 @@ export class Note {
 
   @Prop({ type: String, required: true, unique: true })
   fileId: string;
+
+  @Prop({ type: String, required: true })
+  subject: string;
 }
 
 export const NoteSchema = SchemaFactory.createForClass(Note);

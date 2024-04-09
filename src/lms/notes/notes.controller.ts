@@ -29,7 +29,8 @@ export class NotesController {
     return this.notesService.create(createNoteDto);
   }
 
-  @UseGuards(JwtAuthGuardQBank, JwtAuthGuard)
+  @UseGuards(JwtAuthGuardQBank)
+  @Roles(Role.ADMIN, Role.MODERATOR)
   @Get()
   findAll() {
     return this.notesService.findAll();

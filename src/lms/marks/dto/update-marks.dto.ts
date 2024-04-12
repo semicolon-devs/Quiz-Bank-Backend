@@ -1,7 +1,4 @@
-import { ObjectId } from 'mongoose';
+import { PartialType } from '@nestjs/mapped-types';
+import { AddmarksDto } from './add-marks.dto';
 
-export class UpdateMarksDto {
-  userId?: ObjectId;
-  paperId?: ObjectId;
-  marks?: number;
-}
+export class UpdateMarksDto extends PartialType(AddmarksDto) {}

@@ -12,7 +12,34 @@ export class Marks {
   userId: ObjectId;
 
   @Prop({ type: Number, required: true })
-  marks: number;
+  reading: number;
+
+  @Prop({ type: Number, required: true })
+  logicalAndProblemSolving: number;
+
+  @Prop({ type: Number, required: true })
+  biology: number;
+
+  @Prop({ type: Number, required: true })
+  chemistry: number;
+
+  @Prop({ type: Number, required: true })
+  physicsAndMaths: number;
+
+  @Prop({ type: Number, required: true })
+  didNotAnswer: number;
+
+  @Prop({ type: Number, required: true })
+  wrongAnswer: number;
+
+  @Prop({ type: Number, required: true })
+  corrcetAnswer: number;
+
+  @Prop({ type: Number, required: true })
+  lostmarks: number;
+
+  @Prop({ type: Number, required: true })
+  total: number;
 }
 
 export const MarksSchema = SchemaFactory.createForClass(Marks);

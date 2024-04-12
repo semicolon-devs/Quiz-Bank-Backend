@@ -5,7 +5,6 @@ import { Marks as IMarks } from './interfaces/marks.interface';
 import { Model, ObjectId } from 'mongoose';
 import { AddmarksDto } from './dto/add-marks.dto';
 import { UpdateMarksDto } from './dto/update-marks.dto';
-import { after } from 'node:test';
 
 @Injectable()
 export class MarksService {
@@ -36,17 +35,22 @@ export class MarksService {
   }
 
   async addMarks(addMarksDto: AddmarksDto) {
-    addMarksDto.marks.forEach(async (mark) => {
-      const newMarks: IMarks = {
-        paperId: mark.paperId,
-        userId: addMarksDto.userId,
-        marks: mark.marks,
-      };
+    const newMarks: IMarks = {
+      paperId: addMarksDto.paperId,
+      userId: addMarksDto.userId,
+      reading: addMarksDto.reading,
+      logicalAndProblemSolving: addMarksDto.logicalAndProblemSolving,
+      biology: addMarksDto.biology,
+      chemistry: addMarksDto.chemistry,
+      physicsAndMaths: addMarksDto.physicsAndMaths,
+      didNotAnswer: addMarksDto.didNotAnswer,
+      wrongAnswer: addMarksDto.wrongAnswer,
+      corrcetAnswer: addMarksDto.corrcetAnswer,
+      lostmarks: addMarksDto.lostmarks,
+      total: addMarksDto.total,
+    };
 
-      await this.MarksModel.create(newMarks);
-    });
-
-    return this.MarksModel.find({ userId: addMarksDto.userId });
+    return await this.MarksModel.create(newMarks);
   }
 
   async updateMarks(

@@ -10,5 +10,5 @@ export interface UserInterface {
     key: string;
     expireAt: Date;
   };
+  key?: string;
 }
-

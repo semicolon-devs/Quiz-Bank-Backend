@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { MarksService } from './marks.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { JwtAuthGuard as JwtAuthGuardLms } from '../auth/guards/jwt-auth.guard';
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { Role } from 'src/enums/roles.enum';
 import { AddmarksDto } from './dto/add-marks.dto';
@@ -29,7 +28,7 @@ export class MarksController {
     return await this.marksService.addMarks(data);
   }
 
-  @UseGuards(JwtAuthGuardLms)
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getMarks(@Param('id', ParseObjectIdPipe) userId: ObjectId) {
     return await this.marksService.getMarks(userId);

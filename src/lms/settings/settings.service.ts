@@ -5,7 +5,7 @@ import { Settings as ISettings } from './interfaces/settings.interface';
 import { Model } from 'mongoose';
 import { SettingsDto } from './dto/create-settings.dto';
 import { UpdateSettingsDto } from './dto/update-settings.dto';
-import { UsersService } from '../users/users.service';
+import { UsersService } from 'src/users/users.service';
 import { PapersService } from '../papers/papers.service';
 import { NotesService } from '../notes/notes.service';
 
@@ -43,7 +43,7 @@ export class SettingsService {
 
   // TODO: add other data to delete
   async deleteAllData() {
-    await this.userServices.deleteAll();
+    await this.userServices.deleteAllLMSUsers();
     await this.noteService.removeAll();
     await this.paperService.removeAll();
 

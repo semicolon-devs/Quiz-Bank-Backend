@@ -33,6 +33,11 @@ export class AuthController {
     return await this.usersService.create(registerDto, [Role.USER]);
   }
 
+  @Post('register/lms-user')
+  async registerLMSUser(@Body() registerDto: RegisterDto): Promise<User> {
+    return await this.usersService.createLMSUser(registerDto, [Role.LMS_USER]);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN)
   @Post('register-moderator')
@@ -78,6 +83,13 @@ export class AuthController {
   async getUserDetails(@Request() req: any): Promise<any> {
     const { firstname, lastname, email, roles, _id } = req.user;
     return { firstname, lastname, email, roles, _id };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN)
+  @Get('all-lms-users')
+  async getAllLMSUsers(): Promise<any> {
+    return this.usersService.findAllLMSUsers();
   }
 
   @Post('forget-password-request')

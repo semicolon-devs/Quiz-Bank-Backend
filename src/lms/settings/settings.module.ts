@@ -3,9 +3,8 @@ import { SettingsService } from './settings.service';
 import { SettingsController } from './settings.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Settings, SettingsSchema } from './schemas/settings.schema';
-import { UsersModule } from '../users/users.module';
-import { UsersService } from '../users/users.service';
-import { User, UserSchema } from '../users/schemas/user.schema';
+import { UsersModule } from 'src/users/users.module';
+import { User, UserSchema } from 'src/users/schemas/user.schema';
 import { PapersModule } from '../papers/papers.module';
 import { NotesModule } from '../notes/notes.module';
 import { Paper, PaperSchema } from '../papers/schemas/paper.schema';
@@ -29,6 +28,6 @@ import { PapersService } from '../papers/papers.service';
     ),
   ],
   controllers: [SettingsController],
-  providers: [SettingsService, UsersService, NotesService, PapersService],
+  providers: [SettingsService, NotesService, PapersService],
 })
 export class SettingsModule {}

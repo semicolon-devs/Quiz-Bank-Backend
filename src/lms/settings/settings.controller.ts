@@ -11,7 +11,6 @@ import { SettingsService } from './settings.service';
 import { SettingsDto } from './dto/create-settings.dto';
 import { UpdateSettingsDto } from './dto/update-settings.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { JwtAuthGuard as JwtAuthGuardLms } from '../auth/guards/jwt-auth.guard';
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { Role } from 'src/enums/roles.enum';
 
@@ -26,7 +25,7 @@ export class SettingsController {
     return await this.settingsService.create(data);
   }
 
-  @UseGuards(JwtAuthGuardLms)
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getSettings() {
     return await this.settingsService.getSettings();

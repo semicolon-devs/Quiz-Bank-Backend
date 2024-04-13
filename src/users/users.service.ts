@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
@@ -34,6 +31,25 @@ export class UsersService {
     return createdUser;
   }
 
+  async createLMSUser(registerDto: RegisterDto, roles: Role[]): Promise<User> {
+    const hash = await bcrypt.hash(registerDto.password, saltOrRounds);
+
+    const user: UserInterface = {
+      firstname: registerDto.firstname,
+      lastname: registerDto.lastname,
+      email: registerDto.email,
+      roles: roles,
+      password: hash,
+      key: registerDto.password,
+    };
+    const createdUser = await this.userModel.create(user);
+
+    delete createdUser.password;
+    delete createdUser.key;
+
+    return createdUser;
+  }
+
   async updatePasssword(email: string, newPassword: string): Promise<User> {
     const hash = await bcrypt.hash(newPassword, saltOrRounds);
 
@@ -51,7 +67,7 @@ export class UsersService {
           const updatedUser = await this.userModel
             .findOneAndUpdate(
               { email: payload.email },
-              { password: hash, $unset: { otp: '' } }
+              { password: hash, $unset: { otp: '' } },
             )
             .exec();
 
@@ -90,6 +106,10 @@ export class UsersService {
     return otp;
   }
 
+  async findAllLMSUsers(): Promise<User[]> {
+    return this.userModel.find({ roles: Role.LMS_USER });
+  }
+
   async findOne(email: string): Promise<User> {
     return this.userModel.findOne({ email: email }).exec();
   }
@@ -97,6 +117,13 @@ export class UsersService {
   async delete(id: string): Promise<User> {
     const deletedUser = await this.userModel
       .findByIdAndRemove({ _id: id })
+      .exec();
+    return deletedUser;
+  }
+
+  async deleteAllLMSUsers(): Promise<any> {
+    const deletedUser = await this.userModel
+      .deleteMany({ roles: Role.LMS_USER })
       .exec();
     return deletedUser;
   }

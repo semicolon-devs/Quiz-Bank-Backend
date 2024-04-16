@@ -6,6 +6,8 @@ import {
   HttpCode,
   UseGuards,
   Get,
+  Delete,
+  Param,
 } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { UsersService } from 'src/users/users.service';
@@ -100,5 +102,12 @@ export class AuthController {
   @Post('forget-password-reset')
   async forgetPasswordReset(@Body() payload: ForgetPasswordReset) {
     return this.authService.forgetPasswordReset(payload);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN, Role.MODERATOR)
+  @Delete(`:id`)
+  async removeStudent(@Param('id') id: string) {
+    return this.authService.removeUser(id);
   }
 }

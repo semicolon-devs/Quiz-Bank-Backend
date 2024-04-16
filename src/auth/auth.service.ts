@@ -34,6 +34,10 @@ export class AuthService {
     return await this.getTokens(user.email, user.firstname);
   }
 
+  async removeUser(id: string): Promise<User> {
+    return this.usersService.delete(id);
+  }
+
   async refreshTokens(user: any) {
     return await this.getTokens(user.email, user.firstname);
   }

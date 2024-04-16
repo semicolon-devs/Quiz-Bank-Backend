@@ -43,6 +43,16 @@ export class MarksController {
 
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN)
+  @Get(':userId/:paperId')
+  async getMarksByUserandpaper(
+    @Param('userId', ParseObjectIdPipe) userId: ObjectId,
+    @Param('paperId', ParseObjectIdPipe) paperId: ObjectId,
+  ) {
+    return await this.marksService.findByUserAndPaperId(userId, paperId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN)
   @Patch(':userId/:paperId')
   async updateMarks(
     @Param('userId', ParseObjectIdPipe) userId: ObjectId,

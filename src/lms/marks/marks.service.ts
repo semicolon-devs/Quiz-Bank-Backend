@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Marks } from './schemas/marks.schema';
 import { Marks as IMarks } from './interfaces/marks.interface';
-import { Model, ObjectId } from 'mongoose';
+import { Model, ObjectId, Schema } from 'mongoose';
 import { AddmarksDto } from './dto/add-marks.dto';
 import { UpdateMarksDto } from './dto/update-marks.dto';
 
@@ -14,6 +14,13 @@ export class MarksService {
 
   async getMarks(userId: ObjectId) {
     return this.MarksModel.find({ userId: userId });
+  }
+
+  findByUserAndPaperId(
+    userId: Schema.Types.ObjectId,
+    paperId: Schema.Types.ObjectId,
+  ) {
+    return this.MarksModel.find({ userId: userId, paperId: paperId });
   }
 
   // TODO: complete find all filter

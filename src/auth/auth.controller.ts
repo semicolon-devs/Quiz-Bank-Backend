@@ -33,7 +33,7 @@ export class AuthController {
     return await this.usersService.create(registerDto, [Role.USER]);
   }
 
-  @Post('register/lms-user')
+  @Post('register-lms-user')
   async registerLMSUser(@Body() registerDto: RegisterDto): Promise<User> {
     return await this.usersService.createLMSUser(registerDto, [Role.LMS_USER]);
   }

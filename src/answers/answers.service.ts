@@ -1,6 +1,6 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { FinishPaperDto, SubmitAnswerDto } from './dto/submit-answers.dto';
+import { FinishPaperDto, GetAnswerRequestDto, SubmitAnswerDto } from './dto/submit-answers.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { AnsweredPaper } from './schemas/answered-papers.schema';
 import { Attempt } from './schemas/attempts.schema';
@@ -13,8 +13,8 @@ import { PapersService } from 'src/papers/papers.service';
 @Injectable()
 export class AnswersService {
     constructor(
-        @InjectModel(AnsweredPaper.name) private readonly answerPaperModel : Model<AnsweredPaper>,
-        private readonly paperService: PapersService
+        @InjectModel(AnsweredPaper.name, 'quizbank') private readonly answerPaperModel : Model<AnsweredPaper>,
+        @Inject(forwardRef(() => PapersService)) private readonly paperService: PapersService
     ) {}
 
     async finishPaper(finishPaperDto: FinishPaperDto) {
@@ -37,6 +37,7 @@ export class AnswersService {
                 attempt.finishedAt = submittedAt;
                 attempt.hasFinished = true;
 
+
                 await paper.save();
 
                 return "Paper Finished Successfully!";
@@ -55,6 +56,8 @@ export class AnswersService {
     async submitAnswer(submitAnswerDto: SubmitAnswerDto) {
         const answeredAt : Date = new Date();
         submitAnswerDto.submittedAt = answeredAt;
+
+        submitAnswerDto.questionIndex = Number(submitAnswerDto.questionIndex);
 
         try {
             const filter = { userId : submitAnswerDto.userId };
@@ -108,6 +111,13 @@ export class AnswersService {
 
             const answers : Set<Answered> = new Set(currentAttempt.answers);
 
+            if(submitAnswerDto.questionIndex && submitAnswerDto.questionIndex <= 100) {
+                answers.forEach((answer) => {
+                    if(answer.number == submitAnswerDto.questionIndex){
+                        answers.delete(answer);
+                    }
+                })
+            }
             const newAnswer : Answered = {
                 number: Number(submitAnswerDto.questionIndex),
                 answer: submitAnswerDto.answer,
@@ -116,7 +126,7 @@ export class AnswersService {
     
             answers.add(newAnswer);
 
-            currentAttempt.answers = Array.from(answers);
+            currentAttempt.answers = Array.from(answers).sort((a, b) => a.number - b.number);
             
             await paper.save();
 
@@ -144,10 +154,10 @@ export class AnswersService {
         const paper : AnsweredPaper = await this.answerPaperModel.findOne({ userId, 'attempts.paperId': paperId });
         const answeredQuestions: number[] = [];
 
-        let totalQuesstions;
+        let totalQuestions;
         
         try{
-            totalQuesstions = await this.paperService.getNumberOfQuestions(paperId);
+            totalQuestions = await this.paperService.getNumberOfQuestions(paperId);
         }catch (err) {
             return {
                 answered : answeredQuestions,
@@ -169,19 +179,39 @@ export class AnswersService {
 
             return {
                 answered : answeredQuestions,
-                totalQuesstions: totalQuesstions
+                totalQuestions: totalQuestions
             };
 
         }else {
             return {
                 answered : answeredQuestions,
-                totalQuesstions: totalQuesstions,
+                totalQuestions: totalQuestions,
             };
 
         }
 
 
     }
+
+
+    async getAnswer(getAnswerRequestDto: GetAnswerRequestDto) {
+        try {
+            const paper : AnsweredPaper = await this.answerPaperModel.findOne({ userId : getAnswerRequestDto.userId , 'attempts.paperId': getAnswerRequestDto.paperId });
+      
+            if(paper) {
+
+                return paper.attempts[0].answers.find((ans) => ans.number == getAnswerRequestDto.questionIndex);
+
+            }
+
+
+        } catch (err) {
+            throw err;
+          }
+    }
+
+
+
 
     async getFinishedStatus(paperId: string, userId: string) {
         const paper : AnsweredPaper = await this.answerPaperModel.findOne({ userId, 'attempts.paperId': paperId });
@@ -208,7 +238,7 @@ export class AnswersService {
             for(const answeredQuestion of answeredQuestionsArray) {
                 const answer = await this.paperService.findAnswer(paperId, answeredQuestion.number);
 
-                if(answer.correctAnswer.includes( Number(answeredQuestion.answer) ) ) {
+                if(answer.correctAnswer.every( answer => answeredQuestion.answer.includes(Number(answer))) ) {
                     totalMarks++;
                 }
             }
@@ -236,12 +266,17 @@ export class AnswersService {
                                         isCorrect: false
                                     }
 
-                if(answer.correctAnswer.includes( Number(answeredQuestion.answer) ) ) {
+                // if(answer.correctAnswer.includes( Number(answeredQuestion.answer) ) ) {
+                //     ans.isCorrect = true;
+                // }else {
+                //     ans.isCorrect = false;
+                // }
+
+                if(answer.correctAnswer.every( answer => answeredQuestion.answer.includes(Number(answer))) ) {
                     ans.isCorrect = true;
                 }else {
                     ans.isCorrect = false;
                 }
-
 
                 answers.push(ans);
             }

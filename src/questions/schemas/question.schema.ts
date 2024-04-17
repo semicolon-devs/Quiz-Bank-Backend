@@ -34,7 +34,12 @@ export class Question {
   @Prop({ type: String, enum: QuestionType, required: true })
   type: QuestionType;
 
-  @Prop({ type: String, maxlength: 20 * 1024 * 1024, required: true })
+  @Prop({
+    type: String,
+    text: true,
+    maxlength: 20 * 1024 * 1024,
+    required: true,
+  })
   question: string;
 
   @Prop([{ type: Answer, required: true }])
@@ -45,6 +50,9 @@ export class Question {
 
   @Prop({ type: String, maxlength: 20 * 1024 * 1024, required: true })
   explaination: string;
+
+  @Prop({ type: Boolean, required: true, default: false })
+  isArchived: boolean;
 }
 
 export const QuestionSchema = SchemaFactory.createForClass(Question);

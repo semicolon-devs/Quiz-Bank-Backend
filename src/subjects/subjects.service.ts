@@ -18,11 +18,14 @@ import { UpdateModuleDto } from './dto/update-module.dto';
 @Injectable()
 export class SubjectsService {
   constructor(
-    @InjectModel(Subject.name) private readonly subjectModel: Model<Subject>,
-    @InjectModel(SubCategory.name)
+    @InjectModel(Subject.name, "quizbank")
+    private readonly subjectModel: Model<Subject>,
+    @InjectModel(SubCategory.name, "quizbank")
     private readonly subCategoryModel: Model<SubCategory>,
-    @InjectModel(Question.name) private readonly questionModel: Model<Question>,
-    @InjectModel(Module.name) private readonly moduleModel: Model<Module>,
+    @InjectModel(Question.name, "quizbank")
+    private readonly questionModel: Model<Question>,
+    @InjectModel(Module.name, "quizbank")
+    private readonly moduleModel: Model<Module>,
   ) {}
 
   async create(createSubjectDto: CreateSubjectDto) {

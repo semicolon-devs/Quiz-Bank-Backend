@@ -10,23 +10,30 @@ import { QuestionsModule } from './questions/questions.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { PapersModule } from './papers/papers.module';
 import { AnswersModule } from './answers/answers.module';
+import { LmsModule } from './lms/lms.module';
 dotenv.config();
 
 @Module({
   imports: [
     AuthModule,
     UsersModule,
-    MongooseModule.forRoot(process.env.MONGO_URI),
+    QuestionsModule,
+    SubjectsModule,
+    PapersModule,
+    AnswersModule,
+    LmsModule,
+    MongooseModule.forRoot(process.env.MONGO_URI, {
+      connectionName: 'quizbank',
+    }),
+    MongooseModule.forRoot(process.env.MONGO_LMS_URI, {
+      connectionName: 'lms',
+    }),
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
         limit: 10,
       },
     ]),
-    QuestionsModule,
-    SubjectsModule,
-    PapersModule,
-    AnswersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

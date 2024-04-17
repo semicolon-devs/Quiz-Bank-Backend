@@ -14,10 +14,11 @@ import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
 import { ParseObjectIdPipe } from 'src/common/utils/validation/parseObjectIDPipe';
 import { ObjectId } from 'mongoose';
-import { FilterDTO } from './dto/filter.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { Role } from 'src/enums/roles.enum';
+import { Pagination } from './interfaces/pagination.interface';
+import { Filter } from './interfaces/filter.interface';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('api/v1/questions')
 export class QuestionsController {
@@ -33,15 +34,23 @@ export class QuestionsController {
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
   @Get()
-  findAll() {
-    return this.questionsService.findAll();
+  findAll(@Query() queryParams: Pagination) {
+    return this.questionsService.findAll(queryParams);
   }
 
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
   @Get('filter')
-  filter(@Query() allQueryParams: FilterDTO) {
+  filter(@Query() allQueryParams: Filter) {
     return this.questionsService.filter(allQueryParams);
+  }
+
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+  @Get('archived')
+  getArchived(@Query() allQueryParams: Filter) {
+    return this.questionsService.findAllArchived(allQueryParams);
   }
 
   @UseGuards(JwtAuthGuard)

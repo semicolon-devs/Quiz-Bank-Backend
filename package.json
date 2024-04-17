@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@googleapis/drive": "^8.7.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.1.1",
     "@nestjs/core": "^10.0.0",
@@ -32,6 +33,7 @@
     "bcrypt": "^5.1.1",
     "csurf": "^1.11.0",
     "dotenv": "^16.3.1",
+    "googleapis": "^134.0.0",
     "helmet": "^7.0.0",
     "moment": "^2.29.4",
     "mongoose": "^7.6.0",

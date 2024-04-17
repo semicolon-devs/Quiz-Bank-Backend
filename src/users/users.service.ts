@@ -8,12 +8,14 @@ import { Role } from 'src/enums/roles.enum';
 import { UserInterface } from './interfaces/user.interface';
 import { ForgetPasswordRequest } from './interfaces/forget_password_request.interface';
 import { ForgetPasswordReset } from './interfaces/ForgetPasswordReset.interface';
+import { GoogleDriveService } from 'src/common/services/google_drive/google_drive.service';
 
 const saltOrRounds = 10;
 
 @Injectable()
 export class UsersService {
   constructor(
+    private driveService: GoogleDriveService,
     @InjectModel(User.name, 'quizbank') private readonly userModel: Model<User>,
   ) {}
 
@@ -43,6 +45,13 @@ export class UsersService {
       key: registerDto.password,
     };
     const createdUser = await this.userModel.create(user);
+
+    this.driveService.addPermission(
+      // TODO: get folder id from setting doc
+      '1Sl5ktqpQZ5Jeav4W6aGNhehuFkmnYpfQ', 
+      registerDto.email,
+      'reader',
+    );
 
     delete createdUser.password;
     delete createdUser.key;

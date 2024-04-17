@@ -11,6 +11,7 @@ import { SubjectsModule } from './subjects/subjects.module';
 import { PapersModule } from './papers/papers.module';
 import { AnswersModule } from './answers/answers.module';
 import { LmsModule } from './lms/lms.module';
+import { GoogleDriveService } from './common/services/google_drive/google_drive.service';
 dotenv.config();
 
 @Module({
@@ -36,6 +37,6 @@ dotenv.config();
     ]),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, GoogleDriveService],
 })
 export class AppModule {}

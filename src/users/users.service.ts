@@ -71,7 +71,7 @@ export class UsersService {
             )
             .exec();
 
-          console.log(updatedUser);
+          // console.log(updatedUser);
 
           return updatedUser;
         }
@@ -85,7 +85,7 @@ export class UsersService {
     const otp: string = this.generateOTP();
     const expireTime = new Date().setMinutes(+15);
 
-    console.log(payload);
+    // console.log(payload);
 
     const result = await this.userModel.findOneAndUpdate(
       {

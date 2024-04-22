@@ -22,6 +22,7 @@ import { ForgetPasswordReset } from './dto/forgetPasswordReset.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { UpdatePasswordDto } from './dto/updatePassword.dto';
 
 @Controller('api/v1/auth')
 export class AuthController {
@@ -73,11 +74,11 @@ export class AuthController {
     return this.authService.login(request.user._doc);
   }
 
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
   @Post('reset-password')
-  @HttpCode(200)
-  async passwordReset(@Request() req: any): Promise<any> {
-    return this.authService.resetPassword(req.user, req.Body);
+  async passwordReset(@Request() req: any, @Body() payload: UpdatePasswordDto): Promise<any> {
+    return await this.authService.resetPassword(req.user, payload);
   }
 
   @UseGuards(JwtAuthGuard)

@@ -8,6 +8,7 @@ import {
   Get,
   Delete,
   Param,
+  Patch,
 } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { UsersService } from 'src/users/users.service';
@@ -23,6 +24,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { UpdatePasswordDto } from './dto/updatePassword.dto';
+import { UpdateUserDetailsDto } from './dto/updateUserDetails.dto';
 
 @Controller('api/v1/auth')
 export class AuthController {
@@ -77,7 +79,10 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
   @Post('reset-password')
-  async passwordReset(@Request() req: any, @Body() payload: UpdatePasswordDto): Promise<any> {
+  async passwordReset(
+    @Request() req: any,
+    @Body() payload: UpdatePasswordDto,
+  ): Promise<any> {
     return await this.authService.resetPassword(req.user, payload);
   }
 
@@ -110,5 +115,15 @@ export class AuthController {
   @Delete(`:id`)
   async removeStudent(@Param('id') id: string) {
     return this.authService.removeUser(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+  @Patch()
+  async updateUserDetails(
+    @Request() req: any,
+    @Body() payload: UpdateUserDetailsDto,
+  ) {
+    return this.usersService.updateUserDetails(req.user.email, payload);
   }
 }

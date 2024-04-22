@@ -8,6 +8,7 @@ import { Role } from 'src/enums/roles.enum';
 import { UserInterface } from './interfaces/user.interface';
 import { ForgetPasswordRequest } from './interfaces/forget_password_request.interface';
 import { ForgetPasswordReset } from './interfaces/ForgetPasswordReset.interface';
+import { UpdateUserDetailsDto } from 'src/auth/dto/updateUserDetails.dto';
 
 const saltOrRounds = 10;
 
@@ -81,6 +82,38 @@ export class UsersService {
       });
   }
 
+  async findAllLMSUsers(): Promise<User[]> {
+    return this.userModel.find({ roles: Role.LMS_USER });
+  }
+
+  async findOne(email: string): Promise<User> {
+    return this.userModel.findOne({ email: email }).exec();
+  }
+
+  async delete(id: string): Promise<User> {
+    const deletedUser = await this.userModel
+      .findByIdAndRemove({ _id: id })
+      .exec();
+    return deletedUser;
+  }
+
+  async deleteAllLMSUsers(): Promise<any> {
+    const deletedUser = await this.userModel
+      .deleteMany({ roles: Role.LMS_USER })
+      .exec();
+    return deletedUser;
+  }
+
+  async updateUserDetails(email: string, payload: UpdateUserDetailsDto) {
+    return await this.userModel.findOneAndUpdate(
+      {
+        email: email,
+      },
+      payload,
+      { new: true },
+    );
+  }
+
   async addOTP(payload: ForgetPasswordRequest): Promise<string> {
     const otp: string = this.generateOTP();
     const expireTime = new Date().setMinutes(+15);
@@ -104,28 +137,6 @@ export class UsersService {
     }
 
     return otp;
-  }
-
-  async findAllLMSUsers(): Promise<User[]> {
-    return this.userModel.find({ roles: Role.LMS_USER });
-  }
-
-  async findOne(email: string): Promise<User> {
-    return this.userModel.findOne({ email: email }).exec();
-  }
-
-  async delete(id: string): Promise<User> {
-    const deletedUser = await this.userModel
-      .findByIdAndRemove({ _id: id })
-      .exec();
-    return deletedUser;
-  }
-
-  async deleteAllLMSUsers(): Promise<any> {
-    const deletedUser = await this.userModel
-      .deleteMany({ roles: Role.LMS_USER })
-      .exec();
-    return deletedUser;
   }
 
   generateOTP(): string {

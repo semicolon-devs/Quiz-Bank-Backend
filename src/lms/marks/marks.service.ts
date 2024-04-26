@@ -13,7 +13,7 @@ export class MarksService {
   ) {}
 
   async getMarks(userId: ObjectId) {
-    return this.MarksModel.find({ userId: userId }).populate({ path: 'paperId', select: 'title -_id' });
+    return this.MarksModel.find({ userId: userId }).populate({ path: 'paperId', select: 'title' });
   }
 
   findByUserAndPaperId(

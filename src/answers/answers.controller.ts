@@ -12,7 +12,7 @@ export class AnswersController {
     constructor(private readonly answersService : AnswersService) {}
 
     @UseGuards(JwtAuthGuard)
-    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER, Role.LMS_USER)
     @Get('status/:userId/:paperId/')
     async getQuestionAnsweredStatus(
         @Param('userId') userId : string,
@@ -24,21 +24,21 @@ export class AnswersController {
 
     // TODO:: UserId's should be gained from jwt, rather than request body
     @UseGuards(JwtAuthGuard)
-    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER, Role.LMS_USER)
     @Post('submit/')
     async submitQuestion(@Body() submitAnswerDto : SubmitAnswerDto) {
         return await this.answersService.submitAnswer(submitAnswerDto);
     }
 
     @UseGuards(JwtAuthGuard)
-    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER, Role.LMS_USER)
     @Post('finish/')
     async finishPaper(@Body() finishPaperDto : FinishPaperDto) {
         return await this.answersService.finishPaper(finishPaperDto);
     }
     
     @UseGuards(JwtAuthGuard)
-    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER, Role.LMS_USER)
     @Get('has-finished/:userId/:paperId/')
     async getPaperFinishedStatus(
         @Param('userId') userId : string,
@@ -49,7 +49,7 @@ export class AnswersController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER, Role.LMS_USER)
     @Get('marks/:userId/:paper_id/')
     async getMarks(
         @Param('userId') userId : string,
@@ -60,7 +60,7 @@ export class AnswersController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+    @Roles(Role.ADMIN, Role.MODERATOR, Role.USER, Role.LMS_USER)
     @Get('answers-status/:userId/:paperId/')
     async getQuestionAnswersStatus(
         @Param('userId') userId : string,

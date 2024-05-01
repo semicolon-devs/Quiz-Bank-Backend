@@ -32,14 +32,14 @@ export class QuestionsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+  @Roles(Role.ADMIN, Role.MODERATOR, Role.USER, Role.LMS_USER)
   @Get()
   findAll(@Query() queryParams: Pagination) {
     return this.questionsService.findAll(queryParams);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+  @Roles(Role.ADMIN, Role.MODERATOR, Role.USER, Role.LMS_USER)
   @Get('filter')
   filter(@Query() allQueryParams: Filter) {
     return this.questionsService.filter(allQueryParams);
@@ -47,14 +47,14 @@ export class QuestionsController {
 
 
   @UseGuards(JwtAuthGuard)
-  @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+  @Roles(Role.ADMIN, Role.MODERATOR, Role.USER, Role.LMS_USER)
   @Get('archived')
   getArchived(@Query() allQueryParams: Filter) {
     return this.questionsService.findAllArchived(allQueryParams);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+  @Roles(Role.ADMIN, Role.MODERATOR, Role.USER, Role.LMS_USER)
   @Get(':id')
   findOne(@Param('id', ParseObjectIdPipe) id: ObjectId) {
     return this.questionsService.findOne(id);
@@ -78,7 +78,7 @@ export class QuestionsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Roles(Role.ADMIN, Role.MODERATOR, Role.USER)
+  @Roles(Role.ADMIN, Role.MODERATOR, Role.USER, Role.LMS_USER)
   @Get('')
   getQuestionsStatus() {
 

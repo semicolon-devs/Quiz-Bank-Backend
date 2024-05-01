@@ -11,6 +11,7 @@ import { Paper, PaperSchema } from '../papers/schemas/paper.schema';
 import { Note, NoteSchema } from '../notes/schemas/note.schema';
 import { NotesService } from '../notes/notes.service';
 import { PapersService } from '../papers/papers.service';
+import { Paper as QbPaper, PaperSchema as QbPaperSchema } from 'src/papers/schemas/paper.schema';
 
 @Module({
   imports: [
@@ -20,11 +21,18 @@ import { PapersService } from '../papers/papers.service';
     MongooseModule.forFeature(
       [
         { name: Settings.name, schema: SettingsSchema },
-        { name: User.name, schema: UserSchema },
         { name: Paper.name, schema: PaperSchema },
         { name: Note.name, schema: NoteSchema },
       ],
       'lms',
+    ),
+    MongooseModule.forFeature(
+      [
+        { name: User.name, schema: UserSchema },
+        { name: QbPaper.name, schema: QbPaperSchema },
+        { name: Paper.name, schema: PaperSchema },
+      ],
+      'quizbank',
     ),
   ],
   controllers: [SettingsController],

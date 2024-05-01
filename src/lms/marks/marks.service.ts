@@ -38,6 +38,7 @@ export class MarksService {
         await this.MarksModel.find({ userId: userId.userId }),
       );
     });
+    console.log(userIds);
     console.log(structuredDataSet);
   }
 

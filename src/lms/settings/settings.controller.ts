@@ -57,4 +57,11 @@ export class SettingsController {
   async deleteAllData() {
     return await this.settingsService.deleteAllData();
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN)
+  @Get('dashboard')
+  async getDashboardData() {
+    return await this.settingsService.getDashboardData();
+  }
 }

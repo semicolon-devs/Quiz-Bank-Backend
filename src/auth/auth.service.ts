@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -30,7 +30,7 @@ export class AuthService {
     return null;
   }
 
-  async login(user: UserInterface) {   
+  async login(user: UserInterface) {
     return await this.getTokens(user.email, user.firstname);
   }
 
@@ -43,26 +43,36 @@ export class AuthService {
   }
 
   async resetPassword(user: UserInterface, requestDto: UpdatePasswordDto) {
-    this.usersService.updatePasssword(user.email, requestDto.newPassword);
-    return this.login(user);
+    if (await bcrypt.compare(requestDto.password, user.password)) {
+      await this.usersService.updatePasssword(
+        user.email,
+        requestDto.newPassword,
+      );
+      return this.login(user);
+    } else {
+      throw new HttpException(
+        'Old Password is incorrect!',
+        HttpStatus.FORBIDDEN,
+      );
+    }
   }
 
   async forgetPasswordRequest(payload: ForgetPasswordRequest) {
-    this.usersService.addOTP(payload)
-    .then((otp) => {     
-      sendEmail(otp, payload.email);
-    })
-    .catch((err) => {
-      throw err;
-    })
-
+    this.usersService
+      .addOTP(payload)
+      .then((otp) => {
+        sendEmail(otp, payload.email);
+      })
+      .catch((err) => {
+        throw err;
+      });
   }
 
   async forgetPasswordReset(payload: ForgetPasswordReset) {
     this.usersService.resetPasssword(payload);
   }
 
-  private async getTokens(email: string, firstname: string) {   
+  private async getTokens(email: string, firstname: string) {
     const accessToken = this.jwtService.sign(
       {
         email: email,

@@ -8,6 +8,7 @@ import { Role } from 'src/enums/roles.enum';
 import { UserInterface } from './interfaces/user.interface';
 import { ForgetPasswordRequest } from './interfaces/forget_password_request.interface';
 import { ForgetPasswordReset } from './interfaces/ForgetPasswordReset.interface';
+import { UpdateUserDetailsDto } from 'src/auth/dto/updateUserDetails.dto';
 
 const saltOrRounds = 10;
 
@@ -71,7 +72,7 @@ export class UsersService {
             )
             .exec();
 
-          console.log(updatedUser);
+          // console.log(updatedUser);
 
           return updatedUser;
         }
@@ -79,31 +80,6 @@ export class UsersService {
       .catch((err) => {
         throw err;
       });
-  }
-
-  async addOTP(payload: ForgetPasswordRequest): Promise<string> {
-    const otp: string = this.generateOTP();
-    const expireTime = new Date().setMinutes(+15);
-
-    console.log(payload);
-
-    const result = await this.userModel.findOneAndUpdate(
-      {
-        email: payload.email,
-      },
-      {
-        otp: {
-          key: otp,
-          expireAt: expireTime,
-        },
-      },
-    );
-
-    if (!result) {
-      throw new NotFoundException('Email not found');
-    }
-
-    return otp;
   }
 
   async findAllLMSUsers(): Promise<User[]> {
@@ -126,6 +102,41 @@ export class UsersService {
       .deleteMany({ roles: Role.LMS_USER })
       .exec();
     return deletedUser;
+  }
+
+  async updateUserDetails(email: string, payload: UpdateUserDetailsDto) {
+    return await this.userModel.findOneAndUpdate(
+      {
+        email: email,
+      },
+      payload,
+      { new: true },
+    );
+  }
+
+  async addOTP(payload: ForgetPasswordRequest): Promise<string> {
+    const otp: string = this.generateOTP();
+    const expireTime = new Date().setMinutes(+15);
+
+    // console.log(payload);
+
+    const result = await this.userModel.findOneAndUpdate(
+      {
+        email: payload.email,
+      },
+      {
+        otp: {
+          key: otp,
+          expireAt: expireTime,
+        },
+      },
+    );
+
+    if (!result) {
+      throw new NotFoundException('Email not found');
+    }
+
+    return otp;
   }
 
   generateOTP(): string {

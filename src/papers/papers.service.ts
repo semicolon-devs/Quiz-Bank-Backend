@@ -371,7 +371,7 @@ export class PapersService {
     const papername = await this.paperModel
       .findById(paperId)
       .select('name -_id');
-    console.log(papername);
+    // console.log(papername);
 
     return await this.paperModel.findByIdAndUpdate(
       paperId,

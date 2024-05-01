@@ -13,7 +13,7 @@ export class MarksService {
   ) {}
 
   async getMarks(userId: ObjectId) {
-    return this.MarksModel.find({ userId: userId });
+    return this.MarksModel.find({ userId: userId }).populate({ path: 'paperId', select: 'title' });
   }
 
   findByUserAndPaperId(
@@ -32,7 +32,7 @@ export class MarksService {
     const structuredDataSet: Set<IMarks[]> = new Set();
     userIds.forEach(async (userId) => {
       const data = await this.MarksModel.find({ userId: userId.userId });
-      console.log(userId);
+      // console.log(userId);
 
       structuredDataSet.add(
         await this.MarksModel.find({ userId: userId.userId }),

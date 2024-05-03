@@ -4,7 +4,9 @@ export class AddmarksDto {
   userId: ObjectId;
   paperId: ObjectId;
   reading: number;
-  logicalAndProblemSolving: number;
+  generalKnowledge: number;
+  logicalReasoning: number;
+  ProblemSolving: number;
   biology: number;
   chemistry: number;
   physicsAndMaths: number;

@@ -4,7 +4,9 @@ export interface Marks {
   paperId: ObjectId;
   userId: ObjectId;
   reading: number;
-  logicalAndProblemSolving: number;
+  generalKnowledge: number;
+  logicalReasoning: number;
+  ProblemSolving: number;
   biology: number;
   chemistry: number;
   physicsAndMaths: number;

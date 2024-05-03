@@ -15,7 +15,14 @@ export class Marks {
   reading: number;
 
   @Prop({ type: Number, required: true })
-  logicalAndProblemSolving: number;
+  generalKnowledge: number;
+
+  @Prop({ type: Number, required: true })
+  logicalReasoning: number;
+
+  @Prop({ type: Number, required: true })
+  ProblemSolving: number;
+
 
   @Prop({ type: Number, required: true })
   biology: number;

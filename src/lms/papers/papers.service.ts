@@ -5,11 +5,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Paper } from './schemas/paper.schema';
 import { Model, ObjectId } from 'mongoose';
 import { Paper as IPaper } from './interfaces/paper.interface';
+import { Marks } from '../marks/schemas/marks.schema';
 
 @Injectable()
 export class PapersService {
   constructor(
     @InjectModel(Paper.name, 'lms') private readonly paperModel: Model<Paper>,
+    @InjectModel(Marks.name, 'lms') private readonly marksModel: Model<Marks>,
   ) {}
 
   create(createPaperDto: CreatePaperDto) {
@@ -32,7 +34,8 @@ export class PapersService {
     return this.paperModel.findByIdAndUpdate(id, updatePaperDto, { new: true });
   }
 
-  remove(id: ObjectId) {
+  async remove(id: ObjectId) {
+    await this.marksModel.deleteMany({ paperId: id });
     return this.paperModel.findByIdAndRemove(id);
   }
 

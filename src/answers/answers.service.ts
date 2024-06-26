@@ -100,7 +100,7 @@ export class AnswersService {
                 // paper = await paper.save();
 
             }else {     // redundant 
-                if((paper.attempts.find((attempt) => attempt.paperId == submitAnswerDto.paperId )).hasFinished)
+                if( paper.attempts.find((attempt) => attempt.paperId == submitAnswerDto.paperId) && (paper.attempts.find((attempt) => attempt.paperId == submitAnswerDto.paperId)).hasFinished)
                     throw new HttpException('Not Allowed', HttpStatus.BAD_REQUEST);
             }
 
@@ -227,7 +227,7 @@ export class AnswersService {
         const paper : AnsweredPaper = await this.answerPaperModel.findOne({ userId, 'attempts.paperId': paperId });
         
         if(paper) {
-            if((paper.attempts.find((attempt) => attempt.paperId == paperId )).hasFinished) {
+            if((paper.attempts.find((attempt) => attempt.paperId == paperId )) &&   (paper.attempts.find((attempt) => attempt.paperId == paperId )).hasFinished) {
                 return true;
             }else {
                 return false;

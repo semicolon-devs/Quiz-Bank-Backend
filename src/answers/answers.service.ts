@@ -28,8 +28,8 @@ export class AnswersService {
 
             // TODO:: When there are more than one attempt available
             if(paper && paper.attempts.length != 0) {
-                const attempt : Attempt = paper.attempts[0];
-
+                const attempt : Attempt = paper.attempts.find((attempt) => attempt.paperId == finishPaperDto.paperId )
+                 
                 if(finishPaperDto.paperId != attempt.paperId) {
                     throw new HttpException('PaperId Mismatch', HttpStatus.BAD_REQUEST);
                 }
@@ -98,12 +98,22 @@ export class AnswersService {
             if(paper.attempts.length === 0) { // if attempts array is empty
                 paper.attempts.push(newAttempt);
                 // paper = await paper.save();
-            }else {
-                if(paper.attempts[0].hasFinished)
+
+            }else {     // redundant 
+                if((paper.attempts.find((attempt) => attempt.paperId == submitAnswerDto.paperId )).hasFinished)
                     throw new HttpException('Not Allowed', HttpStatus.BAD_REQUEST);
             }
 
-            const currentAttempt : Attempt = paper.attempts[0];
+            let currentAttempt : Attempt = paper.attempts.find((attempt) => attempt.paperId == submitAnswerDto.paperId )
+
+
+            if(!currentAttempt) {
+                paper.attempts.push(newAttempt);
+                currentAttempt = paper.attempts.find((attempt) => attempt.paperId == submitAnswerDto.paperId );
+            }
+
+            console.log(currentAttempt);
+            // const currentAttempt : Attempt = paper.attempts[0];
 
             if(currentAttempt.paperId != submitAnswerDto.paperId) {
                 throw new HttpException('PaperId Mismatch', HttpStatus.BAD_REQUEST);
@@ -199,8 +209,8 @@ export class AnswersService {
             const paper : AnsweredPaper = await this.answerPaperModel.findOne({ userId : getAnswerRequestDto.userId , 'attempts.paperId': getAnswerRequestDto.paperId });
       
             if(paper) {
-
-                return paper.attempts[0].answers.find((ans) => ans.number == getAnswerRequestDto.questionIndex);
+                const attempt : Attempt = paper.attempts.find((attempt) => attempt.paperId == getAnswerRequestDto.paperId )
+                return attempt.answers.find((ans) => ans.number == getAnswerRequestDto.questionIndex);
 
             }
 
@@ -217,7 +227,7 @@ export class AnswersService {
         const paper : AnsweredPaper = await this.answerPaperModel.findOne({ userId, 'attempts.paperId': paperId });
         
         if(paper) {
-            if(paper.attempts[0].hasFinished) {
+            if((paper.attempts.find((attempt) => attempt.paperId == paperId )).hasFinished) {
                 return true;
             }else {
                 return false;

@@ -242,7 +242,7 @@ export class AnswersService {
         const answeredPaper : AnsweredPaper = await this.answerPaperModel.findOne({ userId, 'attempts.paperId': paperId });
 
         if(answeredPaper) {
-            const answeredQuestionsArray : AnsweredInterface[] = answeredPaper.attempts[0].answers || [];
+            const answeredQuestionsArray : AnsweredInterface[] = answeredPaper.attempts.find((attempt) => attempt.paperId == paperId ).answers || [];
             let totalMarks = 0;
 
             for(const answeredQuestion of answeredQuestionsArray) {
@@ -265,7 +265,7 @@ export class AnswersService {
         const answers : AnswersInterface[] = [];
 
         if(answeredPaper) {
-            const answeredQuestionsArray : AnsweredInterface[] = answeredPaper.attempts[0].answers || [];
+            const answeredQuestionsArray : AnsweredInterface[] = answeredPaper.attempts.find((attempt) => attempt.paperId == paperId ).answers || [];
             
 
             for(const answeredQuestion of answeredQuestionsArray) {

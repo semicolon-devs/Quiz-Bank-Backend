@@ -273,7 +273,9 @@ export class PapersService {
   }
 
   findOneInfo(id: ObjectId) {
-    return this.paperModel.findById(id).select('name paperId -_id');
+    return this.paperModel
+      .findById(id)
+      .select('name paperId timeInMinutes -_id');
   }
 
   async findQuestion(
